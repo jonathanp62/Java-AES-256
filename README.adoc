@@ -1,0 +1,13 @@
+= AES-256
+
+A program that uses AES-256 encryption and decryption for strings and files.
+
+== Configuration Settings
+
+The configuration is expressed in JSON and is supplied in config/config.json in the 'redis' section.
+
+== Logging
+
+Logging is achieved using the SLF4J facade over Logback. The logging configuration is supplied in config/logback.xml.
+
+=== Current version: 0.1.0.
