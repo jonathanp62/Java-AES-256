@@ -1,10 +1,11 @@
 package net.jmp.aes256;
 
 /*
+ * (#)Main.java 0.2.0   06/29/2024
  * (#)Main.java 0.1.0   06/27/2024
  *
  * @author   Jonathan Parker
- * @version  0.1.0
+ * @version  0.2.0
  * @since    0.1.0
  *
  * MIT License
@@ -55,6 +56,18 @@ public final class Main {
         this.logger.entry();
 
         this.logger.info("{} {}", Name.NAME_STRING, Version.VERSION_STRING);
+
+        /*
+         * 1. Check the command line arguments for a) --string | -s or b) --input-file | -i and retain the string or file name or prompt for them
+         * 2. If an input file is provided an output file (--output-file | -o) will be needed
+         * 3. Prompt the user for a user identifier, e.g. email address if not provided on the command line (--user | -u)
+         * 4. Turn the Base 64 encoded UID into salt for the forthcoming encryption (3 iterations) (See the NetBease Base64Encoder project)
+         * 5. Always prompt for the password; this avoids storing it in a script (a unit test is ok)
+         * 6. The password provided serves as the secret key
+         * 7. The Apache Commons CLI dependency will be needed; commons-cli:commons-cli:1.8.0; the MyWordle projects are my latest to use it
+         * 8. https://stackoverflow.com/questions/13329282/test-java-programs-that-read-from-stdin-and-write-to-stdout
+         * 9. First feature branch will be features/input; personal branches can align with steps 1-5
+         */
 
         this.logger.exit();
     }

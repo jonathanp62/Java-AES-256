@@ -39,7 +39,7 @@
 
 plugins {
     id 'application'
-    id 'java-library'
+    id 'java'
     id 'maven-publish'
 }
 
@@ -85,6 +85,11 @@ dependencies {
 group = 'net.jmp.aes256'
 version = '0.2.0'
 description = 'AES-256'
+
+println "The groupId is ${project.group}"
+println "The artifactId is ${project.name}" // Set in settings.gradle
+println "The version is ${project.version}"
+
 java.sourceCompatibility = JavaVersion.VERSION_22
 
 java {
@@ -97,7 +102,11 @@ java {
 publishing {
     publications {
         maven(MavenPublication) {
-            from(components.java)
+            groupId = project.group
+            artifactId = project.name
+            version = project.version
+
+            from components.java
         }
     }
 }
