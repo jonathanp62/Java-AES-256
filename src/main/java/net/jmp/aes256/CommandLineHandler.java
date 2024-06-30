@@ -30,6 +30,7 @@ package net.jmp.aes256;
  * SOFTWARE.
  */
 
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -43,15 +44,20 @@ import org.slf4j.ext.XLogger;
  * The class that handles the command line.
  */
 final class CommandLineHandler {
-    /**
-     * The logger.
-     */
+    /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
 
-    /**
-     * The full command line arguments.
-     */
+    /** The full command line arguments. */
     private final String[] arguments;
+
+    /** The command argument. */
+    private CommandArgument commandArgument;
+
+    /** The command line. */
+    private CommandLine commandLine;
+
+    /** True when the command line arguments have been digested. */
+    private boolean isDigested;
 
     /**
      * A constructor that takes the array
@@ -68,10 +74,8 @@ final class CommandLineHandler {
     /**
      * Digest the command line arguments and
      * return an optional CommandLine object.
-     *
-     * @return java.util.Optional&lt;org.apache.commons.cli.CommandLine&gt;
      */
-    Optional<CommandLine> digestCommandLineArguments() {
+    void digestCommandLineArguments() {
         this.logger.entry();
 
         if (this.logger.isDebugEnabled()) {
@@ -80,11 +84,64 @@ final class CommandLineHandler {
             }
         }
 
-        final var commandLine = this.handleCommandLineArgument();
+        this.commandArgument = this.loadCommandArgument();
+        this.commandLine = this.handleCommandLineArguments(commandArgument);
 
-        this.logger.exit(commandLine);
+        this.isDigested = true;
 
-        return commandLine;
+        this.logger.exit();
+    }
+
+    /**
+     * Return the command argument.
+     *
+     * @return  net.jmp.aes256.CommandArgument
+     */
+    CommandArgument getCommandArgument() {
+        if (this.isDigested) {
+            return this.commandArgument;
+        }
+        else {
+            throw new IllegalStateException("The command line arguments have not been digested.");
+        }
+    }
+
+    /**
+     * Return the optional command line.
+     *
+     * @return  java.util.Optional&lt;org.apache.commons.cli.CommandLine&gt;
+     */
+    Optional<CommandLine> getCommandLine() {
+        if (this.isDigested) {
+            return Optional.ofNullable(this.commandLine);
+        } else {
+            throw new IllegalStateException("The command line arguments have not been digested.");
+        }
+    }
+
+    /**
+     * Examine the command line arguments and
+     * return just the argument (without options).
+     *
+     * @return  net.jmp.aes256.CommandArgument
+     */
+    private CommandArgument loadCommandArgument() {
+        this.logger.entry();
+
+        CommandArgument result;
+
+        final String argument = this.arguments[0];
+
+        result = switch (argument.toLowerCase()) {
+            case "decrypt" -> CommandArgument.DECRYPT;
+            case "encrypt" -> CommandArgument.ENCRYPT;
+            case "-h", "--help" -> CommandArgument.HELP;
+            default -> CommandArgument.UNRECOGNIZED;
+        };
+
+        this.logger.exit(result);
+
+        return result;
     }
 
     /**
@@ -93,27 +150,38 @@ final class CommandLineHandler {
      * The optional is returned empty if the
      * -help argument was specified.
      *
-     * @return java.util.Optional&lt;org.apache.commons.cli.CommandLine&gt;
+     * @return org.apache.commons.cli.CommandLine
      */
-    private Optional<CommandLine> handleCommandLineArgument() {
-        this.logger.entry();
+    private CommandLine handleCommandLineArguments(final CommandArgument commandArgument) {
+        this.logger.entry(commandArgument);
+
+        assert commandArgument != null;
 
         final var options = this.buildOptions();
 
-        Optional<CommandLine> result = Optional.empty();
+        CommandLine result = null;
 
         try {
+            String[] optionsOnly;
+
+            if (commandArgument == CommandArgument.HELP) {
+                optionsOnly = Arrays.copyOf(this.arguments, this.arguments.length);
+            } else {
+                // Remove the first element (a command argument e.g. decrypt, encrypt)
+
+                optionsOnly = Arrays.copyOfRange(this.arguments, 1, this.arguments.length);
+            }
+
             final CommandLineParser parser = new DefaultParser();
+            final CommandLine cl = parser.parse(options, optionsOnly);
 
-            final var commandLine = parser.parse(options, this.arguments);
-
-            if (commandLine.hasOption("help")) {
+            if (cl.hasOption("help")) {
                 final var formatter = new HelpFormatter();
 
                 formatter.printHelp("aes-256.main/net.jmp.aes256.Main", options);
             }
             else
-                result = Optional.of(commandLine);
+                result = cl;
         } catch (final ParseException pe) {
             this.logger.error("Failed to parse the command line arguments");
             this.logger.catching(pe);

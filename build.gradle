@@ -133,7 +133,37 @@ tasks.register('execProgram', JavaExec) {
 }
 
 tasks.register('execHelp', JavaExec) {
-    args '-h'
+    args('-h')
+    allJvmArgs = ['-ea', '-Dapp.configurationFile=config/config.json', '-Dlogback.configurationFile=config/logback.xml']
+    classpath = sourceSets.main.runtimeClasspath
+    description = "Run the main class with JavaExecTask"
+    group = "Execution"
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+    mainClass = javaMainClass
+}
+
+tasks.register('execDecrypt', JavaExec) {
+    args('decrypt', '--string', 'The quick brown fox jumped over the lazy dog!')
+    allJvmArgs = ['-ea', '-Dapp.configurationFile=config/config.json', '-Dlogback.configurationFile=config/logback.xml']
+    classpath = sourceSets.main.runtimeClasspath
+    description = "Run the main class with JavaExecTask"
+    group = "Execution"
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+    mainClass = javaMainClass
+}
+
+tasks.register('execEncrypt', JavaExec) {
+    args('encrypt', '--string', 'The quick brown fox jumped over the lazy dog!')
+    allJvmArgs = ['-ea', '-Dapp.configurationFile=config/config.json', '-Dlogback.configurationFile=config/logback.xml']
+    classpath = sourceSets.main.runtimeClasspath
+    description = "Run the main class with JavaExecTask"
+    group = "Execution"
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+    mainClass = javaMainClass
+}
+
+tasks.register('execUnknown', JavaExec) {
+    args('unknown')
     allJvmArgs = ['-ea', '-Dapp.configurationFile=config/config.json', '-Dlogback.configurationFile=config/logback.xml']
     classpath = sourceSets.main.runtimeClasspath
     description = "Run the main class with JavaExecTask"

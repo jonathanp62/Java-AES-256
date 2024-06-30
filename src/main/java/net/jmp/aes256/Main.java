@@ -49,6 +49,12 @@ public final class Main {
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
 
+    /** The command argument. */
+    private CommandArgument commandArgument;
+
+    /** The command line. */
+    private Optional<CommandLine> commandLine;
+
     /**
      * The default constructor.
      */
@@ -68,7 +74,11 @@ public final class Main {
 
         this.logger.info("{} {}", Name.NAME_STRING, Version.VERSION_STRING);
 
-        this.getCommandLine(args).ifPresent(this::handleCommandLine);
+        this.processCommandLine(args);
+
+        if (this.commandLine.isPresent()) {
+            this.handleCommandLine();
+        }
 
         /*
          * 1. Check the command line arguments for a) --string | -s or b) --input-file | -i and retain the string or file name or prompt for them
@@ -86,12 +96,12 @@ public final class Main {
     }
 
     /**
-     * Return the optional command line object.
+     * Process all the command line arguments into
+     * a single argument followed by options.
      *
      * @param   args    java.lang.String[]
-     * @return          java.util.Optional&lt;org.apache.commons.cli.CommandLine&gt;
      */
-    private Optional<CommandLine> getCommandLine(final String[] args) {
+    private void processCommandLine(final String[] args) {
         this.logger.entry((Object) args);
 
         assert args != null;
@@ -103,35 +113,57 @@ public final class Main {
         else
             commandLineHandler = new CommandLineHandler(args);
 
-        final var commandLine = commandLineHandler.digestCommandLineArguments();
+        commandLineHandler.digestCommandLineArguments();
 
-        this.logger.exit(commandLine);
+        this.commandArgument = commandLineHandler.getCommandArgument();
+        this.commandLine = commandLineHandler.getCommandLine();
 
-        return commandLine;
+        this.logger.exit();
     }
 
     /**
      * Handle the command line.
-     *
-     * @param   commandLine org.apache.commons.cli.CommandLine
      */
-    private void handleCommandLine(final CommandLine commandLine) {
-        this.logger.entry(commandLine);
+    private void handleCommandLine() {
+        this.logger.entry();
 
-        assert commandLine != null;
+        this.logger.debug("Handling argument: {}", this.commandArgument);
 
-        /*
-        if (commandLine.hasOption("learn"))
-            this.handleLearn();
-        else if (commandLine.hasOption("lookup"))
-            this.handleLookup(commandLine);
-        else if (commandLine.hasOption("mywordle"))
-            this.handleMyWordle(commandLine);
-        else if (commandLine.hasOption("tips"))
-            this.handleTips();
-        else
-            throw new RuntimeException("Unexpected command line option encountered");
-        */
+        switch (this.commandArgument) {
+            case DECRYPT:
+                this.decrypt();
+                break;
+            case ENCRYPT:
+                this.encrypt();
+                break;
+            case UNRECOGNIZED:
+                this.logger.error("Unrecognized argument: {}", this.commandArgument);
+                break;
+            default:
+                this.logger.error("Unexpected argument: {}", this.commandArgument);
+        }
+
+        this.logger.exit();
+    }
+
+    /**
+     * Decrypt.
+     */
+    private void decrypt() {
+        this.logger.entry();
+
+        this.logger.info("Operation: Decrypt");
+
+        this.logger.exit();
+    }
+
+    /**
+     * Encrypt.
+     */
+    private void encrypt() {
+        this.logger.entry();
+
+        this.logger.info("Operation: Encrypt");
 
         this.logger.exit();
     }
