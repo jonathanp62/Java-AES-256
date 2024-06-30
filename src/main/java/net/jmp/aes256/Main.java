@@ -31,10 +31,17 @@ package net.jmp.aes256;
  * SOFTWARE.
  */
 
+import java.util.Optional;
+
+import org.apache.commons.cli.CommandLine;
+
 import org.slf4j.LoggerFactory;
 
 import org.slf4j.ext.XLogger;
 
+/**
+ * The main application class.
+ */
 public final class Main {
     /** The default configuration file name. */
     private static final String DEFAULT_APP_CONFIG_FILE = "config/config.json";
@@ -51,11 +58,17 @@ public final class Main {
 
     /**
      * The go method.
+     *
+     * @param   args    java.lang.String[]
      */
-    private void go() {
-        this.logger.entry();
+    private void go(final String[] args) {
+        this.logger.entry((Object) args);
+
+        assert args != null;
 
         this.logger.info("{} {}", Name.NAME_STRING, Version.VERSION_STRING);
+
+        this.getCommandLine(args).ifPresent(this::handleCommandLine);
 
         /*
          * 1. Check the command line arguments for a) --string | -s or b) --input-file | -i and retain the string or file name or prompt for them
@@ -73,11 +86,62 @@ public final class Main {
     }
 
     /**
+     * Return the optional command line object.
+     *
+     * @param   args    java.lang.String[]
+     * @return          java.util.Optional&lt;org.apache.commons.cli.CommandLine&gt;
+     */
+    private Optional<CommandLine> getCommandLine(final String[] args) {
+        this.logger.entry((Object) args);
+
+        assert args != null;
+
+        CommandLineHandler commandLineHandler = null;
+
+        if (args.length == 0)
+            commandLineHandler = new CommandLineHandler(new String[] {"--help"});
+        else
+            commandLineHandler = new CommandLineHandler(args);
+
+        final var commandLine = commandLineHandler.digestCommandLineArguments();
+
+        this.logger.exit(commandLine);
+
+        return commandLine;
+    }
+
+    /**
+     * Handle the command line.
+     *
+     * @param   commandLine org.apache.commons.cli.CommandLine
+     */
+    private void handleCommandLine(final CommandLine commandLine) {
+        this.logger.entry(commandLine);
+
+        assert commandLine != null;
+
+        /*
+        if (commandLine.hasOption("learn"))
+            this.handleLearn();
+        else if (commandLine.hasOption("lookup"))
+            this.handleLookup(commandLine);
+        else if (commandLine.hasOption("mywordle"))
+            this.handleMyWordle(commandLine);
+        else if (commandLine.hasOption("tips"))
+            this.handleTips();
+        else
+            throw new RuntimeException("Unexpected command line option encountered");
+        */
+
+        this.logger.exit();
+    }
+
+    /**
      * The main method.
      *
      * @param   args    java.lang.String[]
      */
     public static void main(final String[] args) {
-        new Main().go();
+        new Main().go(args);
     }
 }
