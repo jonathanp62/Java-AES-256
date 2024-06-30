@@ -80,8 +80,96 @@ final class CommandLineHandler {
             }
         }
 
-        this.logger.exit();
+        final var commandLine = this.handleCommandLineArgument();
 
-        return Optional.empty();
+        this.logger.exit(commandLine);
+
+        return commandLine;
+    }
+
+    /**
+     * Handle the command line arguments and
+     * return an optional CommandLine object.
+     * The optional is returned empty if the
+     * -help argument was specified.
+     *
+     * @return java.util.Optional&lt;org.apache.commons.cli.CommandLine&gt;
+     */
+    private Optional<CommandLine> handleCommandLineArgument() {
+        this.logger.entry();
+
+        final var options = this.buildOptions();
+
+        Optional<CommandLine> result = Optional.empty();
+
+        try {
+            final CommandLineParser parser = new DefaultParser();
+
+            final var commandLine = parser.parse(options, this.arguments);
+
+            if (commandLine.hasOption("help")) {
+                final var formatter = new HelpFormatter();
+
+                formatter.printHelp("aes-256.main/net.jmp.aes256.Main", options);
+            }
+            else
+                result = Optional.of(commandLine);
+        } catch (final ParseException pe) {
+            this.logger.error("Failed to parse the command line arguments");
+            this.logger.catching(pe);
+        }
+
+        this.logger.exit(result);
+
+        return result;
+    }
+
+    /**
+     * Build and return the options
+     * needed for the command line.
+     *
+     * @return org.apache.commons.cli.Options
+     */
+    private Options buildOptions() {
+        this.logger.entry();
+
+        final Option help = Option.builder("h")
+                .desc("Display this help message")
+                .longOpt("help")
+                .build();
+        final Option string = Option.builder("s")
+                .desc("Encrypt/Decrypt a string")
+                .longOpt("string")
+                .build();
+        final Option inputFile = Option.builder("i")
+                .argName("file-name")
+                .hasArg()
+                .desc("Encrypt/Decrypt a file")
+                .longOpt("input-file")
+                .build();
+        final Option outputFile = Option.builder("o")
+                .argName("file-name")
+                .hasArg()
+                .desc("Encrypted/Decrypted output file")
+                .longOpt("output-file")
+                .build();
+        final Option userId = Option.builder("u")
+                .argName("user-id")
+                .hasArg()
+                .desc("User identifier")
+                .longOpt("user")
+                .build();
+
+        final Options options = new Options();
+
+        options.addOption(help);
+        options.addOption(string);
+        options.addOption(inputFile);
+        options.addOption(outputFile);
+        options.addOption(userId);
+
+        this.logger.exit(options);
+
+        return options;
     }
 }
