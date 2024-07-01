@@ -49,8 +49,8 @@ public final class Main {
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
 
-    /** The command argument. */
-    private CommandArgument commandArgument;
+    /** The command operation. */
+    private CommandOperation commandOperation;
 
     /** The command line. */
     private Optional<CommandLine> commandLine;
@@ -115,7 +115,7 @@ public final class Main {
 
         commandLineHandler.digestCommandLineArguments();
 
-        this.commandArgument = commandLineHandler.getCommandArgument();
+        this.commandOperation = commandLineHandler.getCommandOperation();
         this.commandLine = commandLineHandler.getCommandLine();
 
         this.logger.exit();
@@ -127,9 +127,9 @@ public final class Main {
     private void handleCommandLine() {
         this.logger.entry();
 
-        this.logger.debug("Handling argument: {}", this.commandArgument);
+        this.logger.debug("Handling argument: {}", this.commandOperation);
 
-        switch (this.commandArgument) {
+        switch (this.commandOperation) {
             case DECRYPT:
                 this.decrypt();
                 break;
@@ -137,10 +137,10 @@ public final class Main {
                 this.encrypt();
                 break;
             case UNRECOGNIZED:
-                this.logger.error("Unrecognized argument: {}", this.commandArgument);
+                this.logger.error("Unrecognized argument: {}", this.commandOperation);
                 break;
             default:
-                this.logger.error("Unexpected argument: {}", this.commandArgument);
+                this.logger.error("Unexpected argument: {}", this.commandOperation);
         }
 
         this.logger.exit();

@@ -3,7 +3,7 @@
  * (#)build.gradle  0.1.0   06/26/2024
  *
  * @author   Jonathan Parker
- * @version  0.1.0
+ * @version  0.2.0
  * @since    0.1.0
  *
  * MIT License
@@ -44,8 +44,13 @@ plugins {
 apply plugin : 'java'
 
 ext {
+    appConfigFile = '-Dapp.configurationFile=config/config.json'
+    execDescription = 'Run the main class with JavaExecTask'
+    execGroup = 'Execution'
     javaMainClass = 'net.jmp.aes256.Main'
+    logConfigFile = '-Dlogback.configurationFile=config/logback.xml'
     macosArchitecture = System.getProperty('macosArchitecture')
+    useAssertions = '-ea'
 }
 
 println "The macOS architecture is ${macosArchitecture}"
@@ -123,51 +128,61 @@ tasks.withType(Javadoc).configureEach {
  * Execute with - gradle exec... instead of gradle run
  */
 
-tasks.register('execProgram', JavaExec) {
-    allJvmArgs = ['-ea', '-Dapp.configurationFile=config/config.json', '-Dlogback.configurationFile=config/logback.xml']
+tasks.register('execNoArgs', JavaExec) {
+    allJvmArgs = [useAssertions, appConfigFile, logConfigFile] as List<String>
     classpath = sourceSets.main.runtimeClasspath
-    description = "Run the main class with JavaExecTask"
-    group = "Execution"
+    description = execDescription
+    group = execGroup
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     mainClass = javaMainClass
 }
 
-tasks.register('execHelp', JavaExec) {
+tasks.register('execHelpOption', JavaExec) {
     args('-h')
-    allJvmArgs = ['-ea', '-Dapp.configurationFile=config/config.json', '-Dlogback.configurationFile=config/logback.xml']
+    allJvmArgs = [useAssertions, appConfigFile, logConfigFile] as List<String>
     classpath = sourceSets.main.runtimeClasspath
-    description = "Run the main class with JavaExecTask"
-    group = "Execution"
+    description = execDescription
+    group = execGroup
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+    mainClass = javaMainClass
+}
+
+tasks.register('execHelpOperation', JavaExec) {
+    args('help')
+    allJvmArgs = [useAssertions, appConfigFile, logConfigFile] as List<String>
+    classpath = sourceSets.main.runtimeClasspath
+    description = execDescription
+    group = execGroup
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     mainClass = javaMainClass
 }
 
 tasks.register('execDecrypt', JavaExec) {
     args('decrypt', '--string', 'The quick brown fox jumped over the lazy dog!')
-    allJvmArgs = ['-ea', '-Dapp.configurationFile=config/config.json', '-Dlogback.configurationFile=config/logback.xml']
+    allJvmArgs = [useAssertions, appConfigFile, logConfigFile] as List<String>
     classpath = sourceSets.main.runtimeClasspath
-    description = "Run the main class with JavaExecTask"
-    group = "Execution"
+    description = execDescription
+    group = execGroup
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     mainClass = javaMainClass
 }
 
 tasks.register('execEncrypt', JavaExec) {
     args('encrypt', '--string', 'The quick brown fox jumped over the lazy dog!')
-    allJvmArgs = ['-ea', '-Dapp.configurationFile=config/config.json', '-Dlogback.configurationFile=config/logback.xml']
+    allJvmArgs = [useAssertions, appConfigFile, logConfigFile] as List<String>
     classpath = sourceSets.main.runtimeClasspath
-    description = "Run the main class with JavaExecTask"
-    group = "Execution"
+    description = execDescription
+    group = execGroup
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     mainClass = javaMainClass
 }
 
 tasks.register('execUnknown', JavaExec) {
     args('unknown')
-    allJvmArgs = ['-ea', '-Dapp.configurationFile=config/config.json', '-Dlogback.configurationFile=config/logback.xml']
+    allJvmArgs = [useAssertions, appConfigFile, logConfigFile] as List<String>
     classpath = sourceSets.main.runtimeClasspath
-    description = "Run the main class with JavaExecTask"
-    group = "Execution"
+    description = execDescription
+    group = execGroup
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     mainClass = javaMainClass
 }

@@ -50,8 +50,8 @@ final class CommandLineHandler {
     /** The full command line arguments. */
     private final String[] arguments;
 
-    /** The command argument. */
-    private CommandArgument commandArgument;
+    /** The command operation. */
+    private CommandOperation commandOperation;
 
     /** The command line. */
     private CommandLine commandLine;
@@ -84,8 +84,8 @@ final class CommandLineHandler {
             }
         }
 
-        this.commandArgument = this.loadCommandArgument();
-        this.commandLine = this.handleCommandLineArguments(commandArgument);
+        this.commandOperation = this.isolateCommandOperation();
+        this.commandLine = this.handleCommandLineArguments(commandOperation);
 
         this.isDigested = true;
 
@@ -93,13 +93,13 @@ final class CommandLineHandler {
     }
 
     /**
-     * Return the command argument.
+     * Return the command operation.
      *
-     * @return  net.jmp.aes256.CommandArgument
+     * @return  net.jmp.aes256.CommandOperation
      */
-    CommandArgument getCommandArgument() {
+    CommandOperation getCommandOperation() {
         if (this.isDigested) {
-            return this.commandArgument;
+            return this.commandOperation;
         }
         else {
             throw new IllegalStateException("The command line arguments have not been digested.");
@@ -121,22 +121,22 @@ final class CommandLineHandler {
 
     /**
      * Examine the command line arguments and
-     * return just the argument (without options).
+     * return just the operation (without options).
      *
-     * @return  net.jmp.aes256.CommandArgument
+     * @return  net.jmp.aes256.CommandOperation
      */
-    private CommandArgument loadCommandArgument() {
+    private CommandOperation isolateCommandOperation() {
         this.logger.entry();
 
-        CommandArgument result;
+        CommandOperation result;
 
         final String argument = this.arguments[0];
 
         result = switch (argument.toLowerCase()) {
-            case "decrypt" -> CommandArgument.DECRYPT;
-            case "encrypt" -> CommandArgument.ENCRYPT;
-            case "-h", "--help" -> CommandArgument.HELP;
-            default -> CommandArgument.UNRECOGNIZED;
+            case "decrypt" -> CommandOperation.DECRYPT;
+            case "encrypt" -> CommandOperation.ENCRYPT;
+            case "help", "-h", "--help" -> CommandOperation.HELP;
+            default -> CommandOperation.UNRECOGNIZED;
         };
 
         this.logger.exit(result);
@@ -150,12 +150,13 @@ final class CommandLineHandler {
      * The optional is returned empty if the
      * -help argument was specified.
      *
-     * @return org.apache.commons.cli.CommandLine
+     * @param   commandOperation    net.jmp.aes256.CommandOperation
+     * @return                      org.apache.commons.cli.CommandLine
      */
-    private CommandLine handleCommandLineArguments(final CommandArgument commandArgument) {
-        this.logger.entry(commandArgument);
+    private CommandLine handleCommandLineArguments(final CommandOperation commandOperation) {
+        this.logger.entry(commandOperation);
 
-        assert commandArgument != null;
+        assert commandOperation != null;
 
         final var options = this.buildOptions();
 
@@ -164,7 +165,7 @@ final class CommandLineHandler {
         try {
             String[] optionsOnly;
 
-            if (commandArgument == CommandArgument.HELP) {
+            if (commandOperation == CommandOperation.HELP) {
                 optionsOnly = Arrays.copyOf(this.arguments, this.arguments.length);
             } else {
                 // Remove the first element (a command argument e.g. decrypt, encrypt)
@@ -175,10 +176,10 @@ final class CommandLineHandler {
             final CommandLineParser parser = new DefaultParser();
             final CommandLine cl = parser.parse(options, optionsOnly);
 
-            if (cl.hasOption("help")) {
+            if (commandOperation == CommandOperation.HELP || cl.hasOption("help")) {
                 final var formatter = new HelpFormatter();
 
-                formatter.printHelp("aes-256.main/net.jmp.aes256.Main", options);
+                formatter.printHelp("aes-256.main/net.jmp.aes256.Main <decrypt | encrypt | help>", options);
             }
             else
                 result = cl;

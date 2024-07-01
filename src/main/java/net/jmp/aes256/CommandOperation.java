@@ -1,7 +1,7 @@
 package net.jmp.aes256;
 
 /*
- * (#)CommandArgument.java  0.2.0   06/30/2024
+ * (#)CommandOperation.java 0.2.0   06/30/2024
  *
  * @author   Jonathan Parker
  * @version  0.2.0
@@ -31,9 +31,9 @@ package net.jmp.aes256;
  */
 
 /**
- * An enumeration of the command argument values.
+ * An enumeration of the command operation values.
  */
-public enum CommandArgument {
+public enum CommandOperation {
     DECRYPT,
     ENCRYPT,
     HELP,
