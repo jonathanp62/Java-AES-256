@@ -53,7 +53,7 @@ public final class Main {
     private CommandOperation commandOperation;
 
     /** The command line. */
-    private Optional<CommandLine> commandLine;
+    private CommandLine commandLine;
 
     /**
      * The default constructor.
@@ -76,7 +76,7 @@ public final class Main {
 
         this.processCommandLine(args);
 
-        if (this.commandLine.isPresent()) {
+        if (this.commandLine != null) {
             this.handleCommandLine();
         }
 
@@ -116,7 +116,7 @@ public final class Main {
         commandLineHandler.digestCommandLineArguments();
 
         this.commandOperation = commandLineHandler.getCommandOperation();
-        this.commandLine = commandLineHandler.getCommandLine();
+        this.commandLine = commandLineHandler.getCommandLine().orElse(null);
 
         this.logger.exit();
     }

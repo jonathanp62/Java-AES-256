@@ -38,7 +38,7 @@
         </encoder>
     </appender>
 
-    <logger name="net.jmp.aes256.CommandLineHandler" additivity="false" level="trace">
+    <logger name="net.jmp.aes256.CommandLineHandler" additivity="false" level="info">
         <appender-ref ref="MAIN" />
     </logger>
     <logger name="net.jmp.aes256.Main" additivity="false" level="trace">
