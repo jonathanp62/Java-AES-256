@@ -130,6 +130,18 @@ public final class Main {
         final var optionsHandler = new OptionsHandler(this.commandLine);
 
         if (optionsHandler.handle()) {
+            final var containsString = optionsHandler.containsString();
+            final var containsInputFile = optionsHandler.containsInputFile();
+            final var containsOutputFile = optionsHandler.containsOutputFile();
+            final var containsUserId = optionsHandler.containsUserId();
+
+            if (this.logger.isDebugEnabled()) {
+                this.logger.debug("string?     {}", containsString);
+                this.logger.debug("inputFile?  {}", containsInputFile);
+                this.logger.debug("outputFile? {}", containsOutputFile);
+                this.logger.debug("userId?     {}", containsUserId);
+            }
+
             /* Handle the operation */
 
             this.logger.debug("Handling argument: {}", this.commandOperation);

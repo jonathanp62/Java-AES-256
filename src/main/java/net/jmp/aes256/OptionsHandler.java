@@ -110,27 +110,7 @@ final class OptionsHandler {
     boolean handle() {
         this.logger.entry();
 
-        boolean result = true;
-
-        /*
-         * Look for each option checking for mutual exclusivity and
-         * that if files are used, both input and output file names
-         * are provided.
-         */
-
-        result = this.handleString();
-
-        if (result) {
-            result = this.handleInputFile();
-
-            if (result) {
-                result = this.handleOutputFile();
-
-                if (result) {
-                    this.handleUserId();
-                }
-            }
-        }
+        boolean result = this.validateOptions();
 
         if (result && (this.hasString || (this.hasInputFile && this.hasOutputFile))) {
             if (this.hasString) {
@@ -140,6 +120,39 @@ final class OptionsHandler {
                 if (this.logger.isDebugEnabled()) {
                     this.logger.debug("Will handle input file: {}", this.commandLine.getOptionValue("i"));
                     this.logger.debug("Will handle output file: {}", this.commandLine.getOptionValue("o"));
+                }
+            }
+        }
+
+        this.logger.exit(result);
+
+        return result;
+    }
+
+    /**
+     * Return true if the combination of options is valid.
+     *
+     * @return  boolean
+     */
+    private boolean validateOptions() {
+        this.logger.entry();
+
+        /*
+         * Look for each option checking for mutual exclusivity and
+         * that if files are used, both input and output file names
+         * are provided.
+         */
+
+        boolean result = this.handleString();
+
+        if (result) {
+            result = this.handleInputFile();
+
+            if (result) {
+                result = this.handleOutputFile();
+
+                if (result) {
+                    this.handleUserId();
                 }
             }
         }
