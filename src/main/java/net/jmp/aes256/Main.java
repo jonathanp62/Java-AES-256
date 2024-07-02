@@ -111,7 +111,7 @@ public final class Main {
         else
             commandLineHandler = new CommandLineHandler(args);
 
-        commandLineHandler.digestCommandLineArguments();
+        commandLineHandler.handle();
 
         this.commandOperation = commandLineHandler.getCommandOperation();
         this.commandLine = commandLineHandler.getCommandLine().orElse(null);

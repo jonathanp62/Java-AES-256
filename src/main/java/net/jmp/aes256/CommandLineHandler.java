@@ -56,8 +56,8 @@ final class CommandLineHandler {
     /** The command line. */
     private CommandLine commandLine;
 
-    /** True when the command line arguments have been digested. */
-    private boolean isDigested;
+    /** True when the command line arguments have been handled. */
+    private boolean isHandled;
 
     /**
      * A constructor that takes the array
@@ -72,10 +72,10 @@ final class CommandLineHandler {
     }
 
     /**
-     * Digest the command line arguments and
+     * Handle the command line arguments and
      * return an optional CommandLine object.
      */
-    void digestCommandLineArguments() {
+    void handle() {
         this.logger.entry();
 
         if (this.logger.isDebugEnabled()) {
@@ -85,9 +85,9 @@ final class CommandLineHandler {
         }
 
         this.commandOperation = this.isolateCommandOperation();
-        this.commandLine = this.handleCommandLineArguments(commandOperation);
+        this.commandLine = this.processCommandLineArguments(commandOperation);
 
-        this.isDigested = true;
+        this.isHandled = true;
 
         this.logger.exit();
     }
@@ -98,7 +98,7 @@ final class CommandLineHandler {
      * @return  net.jmp.aes256.CommandOperation
      */
     CommandOperation getCommandOperation() {
-        if (this.isDigested) {
+        if (this.isHandled) {
             return this.commandOperation;
         }
         else {
@@ -112,7 +112,7 @@ final class CommandLineHandler {
      * @return  java.util.Optional&lt;org.apache.commons.cli.CommandLine&gt;
      */
     Optional<CommandLine> getCommandLine() {
-        if (this.isDigested) {
+        if (this.isHandled) {
             return Optional.ofNullable(this.commandLine);
         } else {
             throw new IllegalStateException("The command line arguments have not been digested.");
@@ -145,7 +145,7 @@ final class CommandLineHandler {
     }
 
     /**
-     * Handle the command line arguments and
+     * Process the command line arguments and
      * return an optional CommandLine object.
      * The optional is returned empty if the
      * -help argument was specified.
@@ -153,7 +153,7 @@ final class CommandLineHandler {
      * @param   commandOperation    net.jmp.aes256.CommandOperation
      * @return                      org.apache.commons.cli.CommandLine
      */
-    private CommandLine handleCommandLineArguments(final CommandOperation commandOperation) {
+    private CommandLine processCommandLineArguments(final CommandOperation commandOperation) {
         this.logger.entry(commandOperation);
 
         assert commandOperation != null;
@@ -208,6 +208,7 @@ final class CommandLineHandler {
                 .build();
         final Option string = Option.builder("s")
                 .desc("Encrypt/Decrypt a string")
+                .hasArg()
                 .longOpt("string")
                 .build();
         final Option inputFile = Option.builder("i")
