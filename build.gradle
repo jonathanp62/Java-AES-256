@@ -157,7 +157,7 @@ tasks.register('execHelpOperation', JavaExec) {
     mainClass = javaMainClass
 }
 
-tasks.register('execDecrypt', JavaExec) {
+tasks.register('execDecryptNoUser', JavaExec) {
     args('decrypt', '--string', 'The quick brown fox jumped over the lazy dog!')
     allJvmArgs = [useAssertions, appConfigFile, logConfigFile] as List<String>
     classpath = sourceSets.main.runtimeClasspath
@@ -167,8 +167,28 @@ tasks.register('execDecrypt', JavaExec) {
     mainClass = javaMainClass
 }
 
-tasks.register('execEncrypt', JavaExec) {
+tasks.register('execDecryptUser', JavaExec) {
+    args('decrypt', '--string', 'The quick brown fox jumped over the lazy dog!', '--user', 'jonathanp62@gmail.com')
+    allJvmArgs = [useAssertions, appConfigFile, logConfigFile] as List<String>
+    classpath = sourceSets.main.runtimeClasspath
+    description = execDescription
+    group = execGroup
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+    mainClass = javaMainClass
+}
+
+tasks.register('execEncryptStringNoUser', JavaExec) {
     args('encrypt', '--string', 'The quick brown fox jumped over the lazy dog!')
+    allJvmArgs = [useAssertions, appConfigFile, logConfigFile] as List<String>
+    classpath = sourceSets.main.runtimeClasspath
+    description = execDescription
+    group = execGroup
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+    mainClass = javaMainClass
+}
+
+tasks.register('execEncryptStringUser', JavaExec) {
+    args('encrypt', '--string', 'The quick brown fox jumped over the lazy dog!', '--user', 'jonathanp62@gmail.com')
     allJvmArgs = [useAssertions, appConfigFile, logConfigFile] as List<String>
     classpath = sourceSets.main.runtimeClasspath
     description = execDescription

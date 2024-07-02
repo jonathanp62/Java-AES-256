@@ -31,8 +31,6 @@ package net.jmp.aes256;
  * SOFTWARE.
  */
 
-import java.util.Optional;
-
 import org.apache.commons.cli.CommandLine;
 
 import org.slf4j.LoggerFactory;
@@ -127,20 +125,28 @@ public final class Main {
     private void handleCommandLine() {
         this.logger.entry();
 
-        this.logger.debug("Handling argument: {}", this.commandOperation);
+        /* Make sure all required options are provided */
 
-        switch (this.commandOperation) {
-            case DECRYPT:
-                this.decrypt();
-                break;
-            case ENCRYPT:
-                this.encrypt();
-                break;
-            case UNRECOGNIZED:
-                this.logger.error("Unrecognized argument: {}", this.commandOperation);
-                break;
-            default:
-                this.logger.error("Unexpected argument: {}", this.commandOperation);
+        final var optionsHandler = new OptionsHandler(this.commandLine);
+
+        if (optionsHandler.handle()) {
+            /* Handle the operation */
+
+            this.logger.debug("Handling argument: {}", this.commandOperation);
+
+            switch (this.commandOperation) {
+                case DECRYPT:
+                    this.decrypt();
+                    break;
+                case ENCRYPT:
+                    this.encrypt();
+                    break;
+                case UNRECOGNIZED:
+                    this.logger.error("Unrecognized argument: {}", this.commandOperation);
+                    break;
+                default:
+                    this.logger.error("Unexpected argument: {}", this.commandOperation);
+            }
         }
 
         this.logger.exit();
