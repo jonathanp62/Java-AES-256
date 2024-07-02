@@ -31,12 +31,21 @@ package net.jmp.aes256;
  */
 
 import org.apache.commons.cli.CommandLine;
+
 import org.slf4j.LoggerFactory;
 
 import org.slf4j.ext.XLogger;
 
 import java.util.Objects;
 
+/**
+ * The class that handles the validating the options
+ * in terms of mutual exclusivity and co-dependence.
+ * 
+ * @todo Unit test by creating command lines for string and file
+ *       names with and without the user and test the four
+ *       boolean values.
+ */
 final class OptionsHandler {
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
