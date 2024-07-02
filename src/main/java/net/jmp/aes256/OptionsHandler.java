@@ -114,19 +114,50 @@ final class OptionsHandler {
 
         if (result && (this.hasString || (this.hasInputFile && this.hasOutputFile))) {
             if (this.hasString) {
-                if (this.logger.isDebugEnabled())
-                    this.logger.debug("Will handle string: {}", this.commandLine.getOptionValue("s"));
+                this.stringHandled();
             } else {
-                if (this.logger.isDebugEnabled()) {
-                    this.logger.debug("Will handle input file: {}", this.commandLine.getOptionValue("i"));
-                    this.logger.debug("Will handle output file: {}", this.commandLine.getOptionValue("o"));
-                }
+                this.filesHandled();
             }
         }
 
         this.logger.exit(result);
 
         return result;
+    }
+
+    /**
+     * Log the handled string.
+     */
+    private void stringHandled() {
+        this.logger.entry();
+
+        if (this.logger.isDebugEnabled()) {
+            this.logger.debug("Will handle string: {}", this.commandLine.getOptionValue("s"));
+
+            if (this.hasUserId) {
+                this.logger.debug("Will handle user ID: {}", this.commandLine.getOptionValue("u"));
+            }
+        }
+
+        this.logger.exit();
+    }
+
+    /**
+     * Log the handled files.
+     */
+    private void filesHandled() {
+        this.logger.entry();
+
+        if (this.logger.isDebugEnabled()) {
+            this.logger.debug("Will handle input file: {}", this.commandLine.getOptionValue("i"));
+            this.logger.debug("Will handle output file: {}", this.commandLine.getOptionValue("o"));
+
+            if (this.hasUserId) {
+                this.logger.debug("Will handle user ID: {}", this.commandLine.getOptionValue("u"));
+            }
+        }
+
+        this.logger.exit();
     }
 
     /**
