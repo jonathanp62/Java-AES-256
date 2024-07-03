@@ -41,12 +41,11 @@ import java.util.Objects;
 /**
  * The class that handles the validating the options
  * in terms of mutual exclusivity and co-dependence.
- * 
- * @todo Unit test by creating command lines for string and file
- *       names with and without the user and test the four
- *       boolean values.
  */
 final class OptionsHandler {
+    /** Text for the illegal state exception. */
+    private static final String NOT_HANDLED = "The options have not been handled";
+
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
 
@@ -65,6 +64,9 @@ final class OptionsHandler {
     /** True if the --user-id option was provided. */
     private boolean hasUserId;
 
+    /** True when the options have been handled. */
+    private boolean isHandled;
+
     /**
      * A constructor that takes the command line object.
      *
@@ -82,7 +84,11 @@ final class OptionsHandler {
      * @return  boolean
      */
     boolean containsString() {
-        return this.hasString;
+        if (this.isHandled) {
+            return this.hasString;
+        } else {
+            throw new IllegalStateException(NOT_HANDLED);
+        }
     }
 
     /**
@@ -91,7 +97,11 @@ final class OptionsHandler {
      * @return  boolean
      */
     boolean containsInputFile() {
-        return this.hasInputFile;
+        if (this.isHandled) {
+            return this.hasInputFile;
+        } else {
+            throw new IllegalStateException(NOT_HANDLED);
+        }
     }
 
     /**
@@ -100,7 +110,11 @@ final class OptionsHandler {
      * @return  boolean
      */
     boolean containsOutputFile() {
-        return this.hasOutputFile;
+        if (this.isHandled) {
+            return this.hasOutputFile;
+        } else {
+            throw new IllegalStateException(NOT_HANDLED);
+        }
     }
 
     /**
@@ -109,7 +123,20 @@ final class OptionsHandler {
      * @return  boolean
      */
     boolean containsUserId() {
-        return this.hasUserId;
+        if (this.isHandled) {
+            return this.hasUserId;
+        } else {
+            throw new IllegalStateException(NOT_HANDLED);
+        }
+    }
+
+    /**
+     * Return true if this options object has been handled.
+     *
+     * @return  boolean
+     */
+    boolean isHandled() {
+        return this.isHandled;
     }
 
     /**
@@ -128,6 +155,8 @@ final class OptionsHandler {
                 this.filesHandled();
             }
         }
+
+        this.isHandled = true;
 
         this.logger.exit(result);
 

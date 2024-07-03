@@ -32,52 +32,210 @@ package net.jmp.aes256;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public final class TestOptionsHandler {
     @Test
+    public void testIsHandled() {
+        final var args = new String[] {"decrypt", "--string", "The quick brown fox jumped over the lazy dog!"};
+        final var handler = new CommandLineHandler(args);
+
+        handler.handle();
+
+        assertEquals(CommandOperation.DECRYPT, handler.getCommandOperation());
+        assertTrue(handler.getCommandLine().isPresent());
+
+        final var optionsHandler = new OptionsHandler(handler.getCommandLine().get());
+
+        assertFalse(optionsHandler.isHandled());
+    }
+
+    @Test
     public void testDecryptStringNoUser() {
-        assertTrue(true);
+        final var args = new String[] {"decrypt", "--string", "The quick brown fox jumped over the lazy dog!"};
+        final var handler = new CommandLineHandler(args);
+
+        handler.handle();
+
+        assertEquals(CommandOperation.DECRYPT, handler.getCommandOperation());
+        assertTrue(handler.getCommandLine().isPresent());
+
+        final var optionsHandler = new OptionsHandler(handler.getCommandLine().get());
+
+        optionsHandler.handle();
+
+        assertTrue(optionsHandler.isHandled());
+        assertTrue(optionsHandler.containsString());
+        assertFalse(optionsHandler.containsInputFile());
+        assertFalse(optionsHandler.containsOutputFile());
+        assertFalse(optionsHandler.containsUserId());
     }
 
     @Test
     public void testDecryptStringUser() {
-        assertTrue(true);
+        final var args = new String[] {"decrypt", "--string", "The quick brown fox jumped over the lazy dog!", "--user", "jonathanp62@gmail.com"};
+        final var handler = new CommandLineHandler(args);
+
+        handler.handle();
+
+        assertEquals(CommandOperation.DECRYPT, handler.getCommandOperation());
+        assertTrue(handler.getCommandLine().isPresent());
+
+        final var optionsHandler = new OptionsHandler(handler.getCommandLine().get());
+
+        optionsHandler.handle();
+
+        assertTrue(optionsHandler.isHandled());
+        assertTrue(optionsHandler.containsString());
+        assertFalse(optionsHandler.containsInputFile());
+        assertFalse(optionsHandler.containsOutputFile());
+        assertTrue(optionsHandler.containsUserId());
     }
 
     @Test
     public void testDecryptFileNoUser() {
-        assertTrue(true);
+        final var args = new String[] {"decrypt", "--input-file", "/usr/local/input-file.encrypted", "--output-file", "/usr/local/output-file.txt"};
+        final var handler = new CommandLineHandler(args);
+
+        handler.handle();
+
+        assertEquals(CommandOperation.DECRYPT, handler.getCommandOperation());
+        assertTrue(handler.getCommandLine().isPresent());
+
+        final var optionsHandler = new OptionsHandler(handler.getCommandLine().get());
+
+        optionsHandler.handle();
+
+        assertTrue(optionsHandler.isHandled());
+        assertFalse(optionsHandler.containsString());
+        assertTrue(optionsHandler.containsInputFile());
+        assertTrue(optionsHandler.containsOutputFile());
+        assertFalse(optionsHandler.containsUserId());
     }
 
     @Test
     public void testDecryptFileUser() {
-        assertTrue(true);
+        final var args = new String[] {"decrypt", "--input-file", "/usr/local/input-file.encrypted", "--output-file", "/usr/local/output-file.txt", "--user", "jonathanp62@gmail.com"};
+        final var handler = new CommandLineHandler(args);
+
+        handler.handle();
+
+        assertEquals(CommandOperation.DECRYPT, handler.getCommandOperation());
+        assertTrue(handler.getCommandLine().isPresent());
+
+        final var optionsHandler = new OptionsHandler(handler.getCommandLine().get());
+
+        optionsHandler.handle();
+
+        assertTrue(optionsHandler.isHandled());
+        assertFalse(optionsHandler.containsString());
+        assertTrue(optionsHandler.containsInputFile());
+        assertTrue(optionsHandler.containsOutputFile());
+        assertTrue(optionsHandler.containsUserId());
     }
 
     @Test
     public void testEncryptStringNoUser() {
-        assertTrue(true);
+        final var args = new String[] {"encrypt", "--string", "The quick brown fox jumped over the lazy dog!"};
+        final var handler = new CommandLineHandler(args);
+
+        handler.handle();
+
+        assertEquals(CommandOperation.ENCRYPT, handler.getCommandOperation());
+        assertTrue(handler.getCommandLine().isPresent());
+
+        final var optionsHandler = new OptionsHandler(handler.getCommandLine().get());
+
+        optionsHandler.handle();
+
+        assertTrue(optionsHandler.isHandled());
+        assertTrue(optionsHandler.containsString());
+        assertFalse(optionsHandler.containsInputFile());
+        assertFalse(optionsHandler.containsOutputFile());
+        assertFalse(optionsHandler.containsUserId());
     }
 
     @Test
     public void testEncryptStringUser() {
-        assertTrue(true);
+        final var args = new String[] {"encrypt", "--string", "The quick brown fox jumped over the lazy dog!", "--user", "jonathanp62@gmail.com"};
+        final var handler = new CommandLineHandler(args);
+
+        handler.handle();
+
+        assertEquals(CommandOperation.ENCRYPT, handler.getCommandOperation());
+        assertTrue(handler.getCommandLine().isPresent());
+
+        final var optionsHandler = new OptionsHandler(handler.getCommandLine().get());
+
+        optionsHandler.handle();
+
+        assertTrue(optionsHandler.isHandled());
+        assertTrue(optionsHandler.containsString());
+        assertFalse(optionsHandler.containsInputFile());
+        assertFalse(optionsHandler.containsOutputFile());
+        assertTrue(optionsHandler.containsUserId());
     }
 
     @Test
     public void testEncryptFileNoUser() {
-        assertTrue(true);
+        final var args = new String[] {"encrypt", "--input-file", "/usr/local/input-file.txt", "--output-file", "/usr/local/output-file.encrypted"};
+        final var handler = new CommandLineHandler(args);
+
+        handler.handle();
+
+        assertEquals(CommandOperation.ENCRYPT, handler.getCommandOperation());
+        assertTrue(handler.getCommandLine().isPresent());
+
+        final var optionsHandler = new OptionsHandler(handler.getCommandLine().get());
+
+        optionsHandler.handle();
+
+        assertTrue(optionsHandler.isHandled());
+        assertFalse(optionsHandler.containsString());
+        assertTrue(optionsHandler.containsInputFile());
+        assertTrue(optionsHandler.containsOutputFile());
+        assertFalse(optionsHandler.containsUserId());
     }
 
     @Test
     public void testEncryptFileUser() {
-        assertTrue(true);
+        final var args = new String[] {"encrypt", "--input-file", "/usr/local/input-file.txt", "--output-file", "/usr/local/output-file.encrypted", "--user", "jonathanp62@gmail.com"};
+        final var handler = new CommandLineHandler(args);
+
+        handler.handle();
+
+        assertEquals(CommandOperation.ENCRYPT, handler.getCommandOperation());
+        assertTrue(handler.getCommandLine().isPresent());
+
+        final var optionsHandler = new OptionsHandler(handler.getCommandLine().get());
+
+        optionsHandler.handle();
+
+        assertTrue(optionsHandler.isHandled());
+        assertFalse(optionsHandler.containsString());
+        assertTrue(optionsHandler.containsInputFile());
+        assertTrue(optionsHandler.containsOutputFile());
+        assertTrue(optionsHandler.containsUserId());
     }
 
     @Test
     public void testUnknown() {
-        assertTrue(true);
-    }
+        final var args = new String[] {"unknown", "--input-file", "/usr/local/input-file.txt", "--output-file", "/usr/local/output-file.encrypted", "--user", "jonathanp62@gmail.com"};
+        final var handler = new CommandLineHandler(args);
 
+        handler.handle();
+
+        assertEquals(CommandOperation.UNRECOGNIZED, handler.getCommandOperation());
+        assertTrue(handler.getCommandLine().isPresent());
+
+        final var optionsHandler = new OptionsHandler(handler.getCommandLine().get());
+
+        optionsHandler.handle();
+
+        assertTrue(optionsHandler.isHandled());
+        assertFalse(optionsHandler.containsString());
+        assertTrue(optionsHandler.containsInputFile());
+        assertTrue(optionsHandler.containsOutputFile());
+        assertTrue(optionsHandler.containsUserId());
+    }
 }

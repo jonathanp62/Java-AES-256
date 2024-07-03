@@ -44,6 +44,9 @@ import org.slf4j.ext.XLogger;
  * The class that handles the command line.
  */
 final class CommandLineHandler {
+    /** Text for the illegal state exception. */
+    private static final String NOT_HANDLED = "The command line arguments have not been handled";
+
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
 
@@ -111,7 +114,7 @@ final class CommandLineHandler {
             return this.commandOperation;
         }
         else {
-            throw new IllegalStateException("The command line arguments have not been digested.");
+            throw new IllegalStateException(NOT_HANDLED);
         }
     }
 
@@ -124,7 +127,7 @@ final class CommandLineHandler {
         if (this.isHandled) {
             return Optional.ofNullable(this.commandLine);
         } else {
-            throw new IllegalStateException("The command line arguments have not been digested.");
+            throw new IllegalStateException(NOT_HANDLED);
         }
     }
 
