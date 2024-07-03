@@ -32,46 +32,113 @@ package net.jmp.aes256;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public final class TestCommandLineHandler {
     @Test
-    public void testGetCommandOperationWhenHandled() {
-        assertTrue(true);
+    public void testIsHandled() {
+        final var args = new String[] {"encrypt", "--string", "The quick brown fox jumped over the lazy dog!"};
+        final var handler = new CommandLineHandler(args);
+
+        handler.handle();
+
+        assertTrue(handler.isHandled());
     }
 
     @Test
+    public void testIsNotHandled() {
+        final var args = new String[] {"encrypt", "--string", "The quick brown fox jumped over the lazy dog!"};
+        final var handler = new CommandLineHandler(args);
+
+        assertFalse(handler.isHandled());
+    }
+
+    @Test
+    public void testGetCommandOperationWhenHandled() {
+        final var args = new String[] {"encrypt", "--string", "The quick brown fox jumped over the lazy dog!"};
+        final var handler = new CommandLineHandler(args);
+
+        handler.handle();
+
+        assertNotNull(handler.getCommandOperation());
+    }
+
+    @Test(expected = IllegalStateException.class)
     public void testGetCommandOperationWhenNotHandled() {
-        assertTrue(true);
+        final var args = new String[] {"encrypt", "--string", "The quick brown fox jumped over the lazy dog!"};
+        final var handler = new CommandLineHandler(args);
+
+        handler.getCommandOperation();
     }
 
     @Test
     public void testGetCommandLineWhenHandled() {
-        assertTrue(true);
+        final var args = new String[] {"encrypt", "--string", "The quick brown fox jumped over the lazy dog!"};
+        final var handler = new CommandLineHandler(args);
+
+        handler.handle();
+
+        assertTrue(handler.getCommandLine().isPresent());
     }
 
-    @Test
+    @Test(expected = IllegalStateException.class)
     public void testGetCommandLineWhenNotHandled() {
-        assertTrue(true);
+        final var args = new String[] {"encrypt", "--string", "The quick brown fox jumped over the lazy dog!"};
+        final var handler = new CommandLineHandler(args);
+
+        handler.getCommandLine();
     }
 
     @Test
     public void testIsolateCommandOperationDecrypt() {
-        assertTrue(true);
+        final var args = new String[] {"decrypt", "--string", "The quick brown fox jumped over the lazy dog!"};
+        final var handler = new CommandLineHandler(args);
+
+        handler.handle();
+
+        assertEquals(CommandOperation.DECRYPT, handler.getCommandOperation());
     }
 
     @Test
     public void testIsolateCommandOperationEncrypt() {
-        assertTrue(true);
+        final var args = new String[] {"encrypt", "--string", "The quick brown fox jumped over the lazy dog!"};
+        final var handler = new CommandLineHandler(args);
+
+        handler.handle();
+
+        assertEquals(CommandOperation.ENCRYPT, handler.getCommandOperation());
     }
 
     @Test
     public void testIsolateCommandOperationHelp() {
-        assertTrue(true);
+        var args = new String[] {"--help"};
+        var handler = new CommandLineHandler(args);
+
+        handler.handle();
+
+        assertEquals(CommandOperation.HELP, handler.getCommandOperation());
+
+        args = new String[] {"-h"};
+        handler = new CommandLineHandler(args);
+
+        handler.handle();
+
+        assertEquals(CommandOperation.HELP, handler.getCommandOperation());
+        args = new String[] {"help"};
+        handler = new CommandLineHandler(args);
+
+        handler.handle();
+
+        assertEquals(CommandOperation.HELP, handler.getCommandOperation());
     }
 
     @Test
     public void testIsolateCommandOperationUnrecognized() {
-        assertTrue(true);
+        final var args = new String[] {"unknown"};
+        final var handler = new CommandLineHandler(args);
+
+        handler.handle();
+
+        assertEquals(CommandOperation.UNRECOGNIZED, handler.getCommandOperation());
     }
 }

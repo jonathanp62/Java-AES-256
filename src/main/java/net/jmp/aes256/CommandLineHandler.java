@@ -93,6 +93,15 @@ final class CommandLineHandler {
     }
 
     /**
+     * Return true if this command line has been handled.
+     *
+     * @return  boolean
+     */
+    boolean isHandled() {
+        return this.isHandled;
+    }
+
+    /**
      * Return the command operation.
      *
      * @return  net.jmp.aes256.CommandOperation
