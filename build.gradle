@@ -165,6 +165,7 @@ tasks.register('execDecryptStringNoUser', JavaExec) {
     group = execGroup
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     mainClass = javaMainClass
+    standardInput = System.in   // Prevents Scanner.read from throwing NoSuchElementException
 }
 
 tasks.register('execDecryptStringUser', JavaExec) {
@@ -185,6 +186,7 @@ tasks.register('execDecryptFileNoUser', JavaExec) {
     group = execGroup
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     mainClass = javaMainClass
+    standardInput = System.in   // Prevents Scanner.read from throwing NoSuchElementException
 }
 
 tasks.register('execDecryptFileUser', JavaExec) {
@@ -205,6 +207,7 @@ tasks.register('execEncryptStringNoUser', JavaExec) {
     group = execGroup
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     mainClass = javaMainClass
+    standardInput = System.in   // Prevents Scanner.read from throwing NoSuchElementException
 }
 
 tasks.register('execEncryptStringUser', JavaExec) {
@@ -225,6 +228,7 @@ tasks.register('execEncryptFileNoUser', JavaExec) {
     group = execGroup
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     mainClass = javaMainClass
+    standardInput = System.in   // Prevents Scanner.read from throwing NoSuchElementException
 }
 
 tasks.register('execEncryptFileUser', JavaExec) {

@@ -31,6 +31,10 @@ package net.jmp.aes256;
  * SOFTWARE.
  */
 
+import java.io.Console;
+
+import java.util.Arrays;
+
 import org.apache.commons.cli.CommandLine;
 
 import org.slf4j.LoggerFactory;
@@ -140,22 +144,75 @@ public final class Main {
                 this.logger.debug("userId?     {}", containsUserId);
             }
 
-            /* Handle the operation */
+            String string = null;
+            String inputFile = null;
+            String outputFile = null;
 
-            this.logger.debug("Handling argument: {}", this.commandOperation);
+            String userId;
+            String password;
 
-            switch (this.commandOperation) {
-                case DECRYPT:
-                    this.decrypt();
-                    break;
-                case ENCRYPT:
-                    this.encrypt();
-                    break;
-                case UNRECOGNIZED:
-                    this.logger.error("Unrecognized argument: {}", this.commandOperation);
-                    break;
-                default:
-                    this.logger.error("Unexpected argument: {}", this.commandOperation);
+            if (containsString) {
+                string = this.commandLine.getOptionValue("s");
+            }
+
+            if (containsInputFile) {
+                inputFile = this.commandLine.getOptionValue("i");
+            }
+
+            if (containsOutputFile) {
+                outputFile = this.commandLine.getOptionValue("o");
+            }
+
+            final Console console = System.console();
+
+            /* Make sure there is a user ID */
+
+            if (containsUserId) {
+                userId = this.commandLine.getOptionValue("u");
+            } else {
+                System.out.println("Please enter your user ID:");
+
+                userId = console.readLine();
+            }
+
+            /* Prompt for a password */
+
+            System.out.println("Please enter your password:");
+
+            password = Arrays.toString(console.readPassword());
+
+            System.out.println("Please re-enter your password:");
+
+            final var password2 = Arrays.toString(console.readPassword());
+
+            if (password.equals(password2)) {
+                if (this.logger.isDebugEnabled()) {
+                    this.logger.debug("string:     {}", string);
+                    this.logger.debug("inputFile:  {}", inputFile);
+                    this.logger.debug("outputFile: {}", outputFile);
+                    this.logger.debug("userId:     {}", userId);
+                    this.logger.debug("password    {}", password);
+                }
+
+                /* Handle the operation */
+
+                this.logger.debug("Handling argument: {}", this.commandOperation);
+
+                switch (this.commandOperation) {
+                    case DECRYPT:
+                        this.decrypt();
+                        break;
+                    case ENCRYPT:
+                        this.encrypt();
+                        break;
+                    case UNRECOGNIZED:
+                        this.logger.error("Unrecognized argument: {}", this.commandOperation);
+                        break;
+                    default:
+                        this.logger.error("Unexpected argument: {}", this.commandOperation);
+                }
+            } else {
+                System.out.println("Passwords do not match; aborting operation");
             }
         }
 
