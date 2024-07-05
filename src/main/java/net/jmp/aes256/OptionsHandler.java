@@ -347,4 +347,21 @@ final class OptionsHandler {
 
         this.logger.exit();
     }
+
+    /**
+     * The to-string method.
+     *
+     * @return  java.lang.String
+     */
+    @Override
+    public String toString() {
+        return "OptionsHandler{" +
+                ", commandLine=" + commandLine +
+                ", hasString=" + hasString +
+                ", hasInputFile=" + hasInputFile +
+                ", hasOutputFile=" + hasOutputFile +
+                ", hasUserId=" + hasUserId +
+                ", isHandled=" + isHandled +
+                '}';
+    }
 }

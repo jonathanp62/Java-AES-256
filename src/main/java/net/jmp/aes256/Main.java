@@ -34,6 +34,7 @@ package net.jmp.aes256;
 import java.io.Console;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 import org.apache.commons.cli.CommandLine;
 
@@ -83,13 +84,12 @@ public final class Main {
         }
 
         /*
-         * 1. Prompt the user for a user identifier, e.g. email address if not provided on the command line (--user | -u)
-         * 2. Turn the Base 64 encoded UID into salt for the forthcoming encryption (3 iterations) (See the NetBease Base64Encoder project)
-         * 3. Always prompt for the password; this avoids storing it in a script (a unit test is ok)
-         * 4. The password provided serves as the secret key
-         * 5. The Apache Commons CLI dependency will be needed; commons-cli:commons-cli:1.8.0; the MyWordle projects are my latest to use it
-         * 6. https://stackoverflow.com/questions/13329282/test-java-programs-that-read-from-stdin-and-write-to-stdout
-         * 7. First feature branch will be features/input; personal branches can align with steps 1-5
+         * 1. Turn the Base 64 encoded user ID into salt for the forthcoming encryption (3 iterations) (See the NetBeans Base64Encoder project)
+         * 2. Always prompt for the password; this avoids storing it in a script (a unit test is ok)
+         * 3. The password provided serves as the secret key
+         * 4. The Apache Commons CLI dependency will be needed; commons-cli:commons-cli:1.8.0; the MyWordle projects are my latest to use it
+         * 5. https://stackoverflow.com/questions/13329282/test-java-programs-that-read-from-stdin-and-write-to-stdout
+         * 6. First feature branch will be features/input; personal branches can align with steps 1-5
          */
 
         this.logger.exit();
@@ -132,88 +132,135 @@ public final class Main {
         final var optionsHandler = new OptionsHandler(this.commandLine);
 
         if (optionsHandler.handle()) {
-            final var containsString = optionsHandler.containsString();
-            final var containsInputFile = optionsHandler.containsInputFile();
-            final var containsOutputFile = optionsHandler.containsOutputFile();
-            final var containsUserId = optionsHandler.containsUserId();
-
             if (this.logger.isDebugEnabled()) {
-                this.logger.debug("string?     {}", containsString);
-                this.logger.debug("inputFile?  {}", containsInputFile);
-                this.logger.debug("outputFile? {}", containsOutputFile);
-                this.logger.debug("userId?     {}", containsUserId);
+                this.logger.debug(optionsHandler.toString());
             }
 
-            String string = null;
-            String inputFile = null;
-            String outputFile = null;
+            this.handleCommandLineOptions(optionsHandler);
+        }
 
-            String userId;
-            String password;
+        this.logger.exit();
+    }
 
-            if (containsString) {
-                string = this.commandLine.getOptionValue("s");
+    private void handleCommandLineOptions(final OptionsHandler optionsHandler) {
+        this.logger.entry(optionsHandler);
+
+        final Options options = Builder.of(Options::new)
+                .with(Options::setString, (optionsHandler.containsString()) ? this.commandLine.getOptionValue("s") : null)
+                .with(Options::setInputFile, (optionsHandler.containsInputFile()) ? this.commandLine.getOptionValue("i") : null)
+                .with(Options::setOutputFile, (optionsHandler.containsOutputFile()) ? this.commandLine.getOptionValue("o") : null)
+                .with(Options::setUserId, this.promptForUserId((optionsHandler.containsUserId()) ? this.commandLine.getOptionValue("u") : null).orElse(null))
+                .with(Options::setPassword, this.promptForPassword().orElse(null))
+                .build();
+
+        if (options.getPassword() != null) {
+            if (this.logger.isDebugEnabled()) {
+                this.logger.debug(options.toString());
             }
 
-            if (containsInputFile) {
-                inputFile = this.commandLine.getOptionValue("i");
-            }
+            this.handleOperation(options);
+        }
 
-            if (containsOutputFile) {
-                outputFile = this.commandLine.getOptionValue("o");
-            }
+        this.logger.exit();
+    }
 
-            final Console console = System.console();
+    /**
+     * Prompt for the user identifier. An
+     * empty optional is returned if a
+     * console is not available.
+     *
+     * @return  java.util.Optional&lt;java.lang.String&;gt
+     */
+    private Optional<String> promptForUserId(final String userId) {
+        this.logger.entry(userId);
 
-            /* Make sure there is a user ID */
+        final Console console = System.console();
 
-            if (containsUserId) {
-                userId = this.commandLine.getOptionValue("u");
-            } else {
+        Optional<String> result;
+
+        if (console == null) {
+            this.logger.error("There is no console available");
+
+            result = Optional.empty();
+        } else {
+            if (userId == null) {
                 System.out.println("Please enter your user ID:");
 
-                userId = console.readLine();
+                result = Optional.of(console.readLine());
+            } else {
+                result = Optional.of(userId);
             }
+        }
 
-            /* Prompt for a password */
+        this.logger.exit(result);
 
+        return result;
+    }
+
+    /**
+     * Prompt for the password. An empty
+     * optional is returned if the two
+     * passwords entered did not match or
+     * a console is not available.
+     *
+     * @return  java.util.Optional&lt;java.lang.String&;gt
+     */
+    private Optional<String> promptForPassword() {
+        this.logger.entry();
+
+        Optional<String> result;
+
+        final Console console = System.console();
+
+        if (console == null) {
+            this.logger.error("There is no console available");
+
+            result = Optional.empty();
+        } else {
             System.out.println("Please enter your password:");
 
-            password = Arrays.toString(console.readPassword());
+            final char[] password1 = console.readPassword();
 
             System.out.println("Please re-enter your password:");
 
-            final var password2 = Arrays.toString(console.readPassword());
+            final char[] password2 = console.readPassword();
 
-            if (password.equals(password2)) {
-                if (this.logger.isDebugEnabled()) {
-                    this.logger.debug("string:     {}", string);
-                    this.logger.debug("inputFile:  {}", inputFile);
-                    this.logger.debug("outputFile: {}", outputFile);
-                    this.logger.debug("userId:     {}", userId);
-                    this.logger.debug("password    {}", password);
-                }
-
-                /* Handle the operation */
-
-                this.logger.debug("Handling argument: {}", this.commandOperation);
-
-                switch (this.commandOperation) {
-                    case DECRYPT:
-                        this.decrypt();
-                        break;
-                    case ENCRYPT:
-                        this.encrypt();
-                        break;
-                    case UNRECOGNIZED:
-                        this.logger.error("Unrecognized argument: {}", this.commandOperation);
-                        break;
-                    default:
-                        this.logger.error("Unexpected argument: {}", this.commandOperation);
-                }
+            if (Arrays.equals(password1, password2)) {
+                result = Optional.of(new String(password1));
             } else {
-                System.out.println("Passwords do not match; aborting operation");
+                this.logger.error("The two (2) entered passwords do not match");
+
+                result = Optional.empty();
             }
+        }
+
+        this.logger.exit(result);
+
+        return result;
+    }
+
+    /**
+     * Handle the operation.
+     *
+     * @param   options net.jmp.aes256.Options
+     */
+    private void handleOperation(final Options options) {
+        this.logger.entry(options);
+
+        this.logger.debug("Handling argument: {}", this.commandOperation);
+
+        switch (this.commandOperation) {
+            case DECRYPT:
+                this.decrypt(options);
+                break;
+            case ENCRYPT:
+                this.encrypt(options);
+                break;
+            case UNRECOGNIZED:
+                this.logger.error("Unrecognized argument: {}", this.commandOperation);
+                break;
+            default:
+                this.logger.error("Unexpected argument: {}", this.commandOperation);
         }
 
         this.logger.exit();
@@ -222,10 +269,12 @@ public final class Main {
     /**
      * Decrypt.
      */
-    private void decrypt() {
-        this.logger.entry();
+    private void decrypt(final Options options) {
+        this.logger.entry(options);
 
-        this.logger.info("Operation: Decrypt");
+        final Decrypter decrypter = new Decrypter(options);
+
+        decrypter.decrypt();
 
         this.logger.exit();
     }
@@ -233,10 +282,12 @@ public final class Main {
     /**
      * Encrypt.
      */
-    private void encrypt() {
-        this.logger.entry();
+    private void encrypt(final Options options) {
+        this.logger.entry(options);
 
-        this.logger.info("Operation: Encrypt");
+        final Encrypter encrypter = new Encrypter(options);
+
+        encrypter.encrypt();
 
         this.logger.exit();
     }
