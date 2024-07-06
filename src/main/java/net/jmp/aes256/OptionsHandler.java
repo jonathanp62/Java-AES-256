@@ -246,7 +246,7 @@ final class OptionsHandler {
             this.logger.debug("Found --string option");
 
             if (this.commandLine.hasOption("i") || this.commandLine.hasOption("o")) {
-                this.logger.error("Options --input-file or --output-file are not allowed with --string");
+                System.out.println("Options --input-file and --output-file are not allowed with --string");
 
                 result = false;
             }
@@ -276,13 +276,13 @@ final class OptionsHandler {
             this.logger.debug("Found --input-file option");
 
             if (!this.commandLine.hasOption("o")) {
-                this.logger.error("Option --output-file option must be specified with --input-file");
+                System.out.println("Option --output-file option must be specified with --input-file");
 
                 result = false;
             }
 
             if (this.commandLine.hasOption("s")) {
-                this.logger.debug("Option --string is not allowed with --input-file");
+                System.out.println("Option --string is not allowed with --input-file");
 
                 result = false;
             }
@@ -312,13 +312,13 @@ final class OptionsHandler {
             this.logger.debug("Found --output-file option");
 
             if (!this.commandLine.hasOption("i")) {
-                this.logger.error("Option --input-file option must be specified with --output-file");
+                System.out.println("Option --input-file option must be specified with --output-file");
 
                 result = false;
             }
 
             if (this.commandLine.hasOption("s")) {
-                this.logger.debug("Option --string is not allowed with --output-file");
+                System.out.println("Option --string is not allowed with --output-file");
 
                 result = false;
             }

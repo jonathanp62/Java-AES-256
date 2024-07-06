@@ -80,7 +80,11 @@ public final class Main {
 
         assert args != null;
 
-        this.logger.info("{} {}", Name.NAME_STRING, Version.VERSION_STRING);
+        if (this.logger.isInfoEnabled() || this.logger.isWarnEnabled() || this.logger.isErrorEnabled()) {
+            System.out.format("%s %s%n", Name.NAME_STRING, Version.VERSION_STRING);
+        } else {
+            this.logger.debug("{} {}", Name.NAME_STRING, Version.VERSION_STRING);
+        }
 
         this.processCommandLine(args);
 
@@ -230,7 +234,7 @@ public final class Main {
             if (Arrays.equals(password1, password2)) {
                 result = Optional.of(new String(password1));
             } else {
-                this.logger.error("The two (2) entered passwords do not match");
+                System.out.println("The two (2) entered passwords do not match");
 
                 result = Optional.empty();
             }
@@ -259,7 +263,7 @@ public final class Main {
                 this.encrypt(options);
                 break;
             case UNRECOGNIZED:
-                this.logger.error("Unrecognized argument: {}", this.commandOperation);
+                System.out.format("Unrecognized argument: %s%n", this.commandOperation);
                 break;
             default:
                 this.logger.error("Unexpected argument: {}", this.commandOperation);
