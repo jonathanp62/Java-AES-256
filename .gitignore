@@ -4,4 +4,5 @@ build
 gradle/*
 !gradle/libs.versions.toml
 gradlew
+out
 target

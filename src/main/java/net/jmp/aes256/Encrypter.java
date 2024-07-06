@@ -1,10 +1,11 @@
 package net.jmp.aes256;
 
 /*
+ * (#)Encrypter.java    0.3.0   07/06/2024
  * (#)Encrypter.java    0.2.0   07/05/2024
  *
  * @author   Jonathan Parker
- * @version  0.2.0
+ * @version  0.3.0
  * @since    0.2.0
  *
  * MIT License
@@ -29,6 +30,8 @@ package net.jmp.aes256;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+import java.io.File;
 
 import org.slf4j.LoggerFactory;
 
@@ -68,9 +71,71 @@ final class Encrypter {
     void encrypt() {
         this.logger.entry();
 
-        this.logger.info("Begin encryption");
-        this.logger.info("Ending encryption");
+        if (this.options.getString() != null) {
+            this.encryptString();
+        }
+
+        if (this.options.getInputFile() != null && this.options.getOutputFile() != null) {
+            this.encryptFile();
+        }
+
+        if (this.logger.isDebugEnabled()) {
+            this.logger.debug("End encryption");
+        }
 
         this.logger.exit();
+    }
+
+    /**
+     * Encrypt a string.
+     *
+     * @since   0.3.0
+     */
+    private void encryptString() {
+        this.logger.entry();
+
+        if (this.logger.isDebugEnabled()) {
+            this.logger.debug("Begin encrypting string: {}", this.options.getString());
+        }
+
+        this.logger.exit();
+    }
+
+    /**
+     * Encrypt a file.
+     *
+     * @since   0.3.0
+     */
+    private void encryptFile() {
+        this.logger.entry();
+
+        if (this.logger.isDebugEnabled()) {
+            this.logger.debug("Begin encrypting file: {}", this.options.getInputFile());
+        }
+
+        if (this.doesInputFileExist()) {
+
+        } else {
+            System.out.format("Input file '%s' does not exist%n", this.options.getInputFile());
+        }
+
+        this.logger.exit();
+    }
+
+    /**
+     * Return true if the specified input file exists.
+     *
+     * @return  boolean
+     * @since   0.3.0
+     */
+    private boolean doesInputFileExist() {
+        this.logger.entry();
+
+        final File file = new File(this.options.getInputFile());
+        final boolean exists = file.exists();
+
+        this.logger.exit(exists);
+
+        return exists;
     }
 }

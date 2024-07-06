@@ -1,11 +1,12 @@
 package net.jmp.aes256;
 
 /*
+ * (#)Main.java 0.3.0   07/06/2024
  * (#)Main.java 0.2.0   06/29/2024
  * (#)Main.java 0.1.0   06/27/2024
  *
  * @author   Jonathan Parker
- * @version  0.2.0
+ * @version  0.3.0
  * @since    0.1.0
  *
  * MIT License
@@ -148,6 +149,11 @@ public final class Main {
         this.logger.exit();
     }
 
+    /**
+     * Handle the command line options.
+     *
+     * @param   optionsHandler  net.jmp.aes256.OptionsHandler
+     */
     private void handleCommandLineOptions(final OptionsHandler optionsHandler) {
         this.logger.entry(optionsHandler);
 
