@@ -49,6 +49,9 @@ public final class Main {
     /** The default configuration file name. */
     private static final String DEFAULT_APP_CONFIG_FILE = "config/config.json";
 
+    /** The no console available message. */
+    private static final String NO_CONSOLE_AVAILABLE = "There is no console available";
+
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
 
@@ -59,9 +62,11 @@ public final class Main {
     private CommandLine commandLine;
 
     /**
-     * The default constructor.
+     * The default constructor. It has
+     * package access in order for the
+     * unit test to access it.
      */
-    private Main() {
+    Main() {
         super();
     }
 
@@ -87,9 +92,6 @@ public final class Main {
          * 1. Turn the Base 64 encoded user ID into salt for the forthcoming encryption (3 iterations) (See the NetBeans Base64Encoder project)
          * 2. Always prompt for the password; this avoids storing it in a script (a unit test is ok)
          * 3. The password provided serves as the secret key
-         * 4. The Apache Commons CLI dependency will be needed; commons-cli:commons-cli:1.8.0; the MyWordle projects are my latest to use it
-         * 5. https://stackoverflow.com/questions/13329282/test-java-programs-that-read-from-stdin-and-write-to-stdout
-         * 6. First feature branch will be features/input; personal branches can align with steps 1-5
          */
 
         this.logger.exit();
@@ -106,7 +108,7 @@ public final class Main {
 
         assert args != null;
 
-        CommandLineHandler commandLineHandler = null;
+        CommandLineHandler commandLineHandler;
 
         if (args.length == 0)
             commandLineHandler = new CommandLineHandler(new String[] {"--help"});
@@ -179,7 +181,7 @@ public final class Main {
         Optional<String> result;
 
         if (console == null) {
-            this.logger.error("There is no console available");
+            this.logger.error(NO_CONSOLE_AVAILABLE);
 
             result = Optional.empty();
         } else {
@@ -213,7 +215,7 @@ public final class Main {
         final Console console = System.console();
 
         if (console == null) {
-            this.logger.error("There is no console available");
+            this.logger.error(NO_CONSOLE_AVAILABLE);
 
             result = Optional.empty();
         } else {

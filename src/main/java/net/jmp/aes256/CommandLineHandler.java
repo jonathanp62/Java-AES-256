@@ -211,7 +211,7 @@ final class CommandLineHandler {
      *
      * @return org.apache.commons.cli.Options
      */
-    private Options buildOptions() {
+    private org.apache.commons.cli.Options buildOptions() {
         this.logger.entry();
 
         final Option help = Option.builder("h")
@@ -242,7 +242,7 @@ final class CommandLineHandler {
                 .longOpt("user")
                 .build();
 
-        final Options options = new Options();
+        final org.apache.commons.cli.Options options = new org.apache.commons.cli.Options();
 
         options.addOption(help);
         options.addOption(string);
