@@ -82,6 +82,7 @@ dependencies {
     runtimeOnly         libs.ch.qos.logback.logback.core
     implementation      libs.com.google.code.gson.gson
     implementation      libs.commons.cli.commons.cli
+    implementation      libs.commons.codec.commons.codec
     implementation      libs.org.slf4j.slf4j.api
     implementation      libs.org.slf4j.slf4j.ext
     testImplementation  libs.junit.junit
