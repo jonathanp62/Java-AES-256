@@ -32,6 +32,7 @@ package net.jmp.aes256;
  */
 
 import java.io.File;
+import java.util.Objects;
 
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +63,7 @@ final class Encrypter {
     Encrypter(final Options options) {
         super();
 
-        this.options = options;
+        this.options = Objects.requireNonNull(options);
     }
 
     /**
