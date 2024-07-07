@@ -99,6 +99,9 @@ final class Decrypter {
             this.logger.debug("Begin decrypting string: {}", this.options.getString());
         }
 
+        final Salter salter = new Salter(this.options.getUserId());
+        final String salt = salter.getSalt();
+
         this.logger.exit();
     }
 
@@ -115,7 +118,8 @@ final class Decrypter {
         }
 
         if (this.doesInputFileExist()) {
-
+            final Salter salter = new Salter(this.options.getUserId());
+            final String salt = salter.getSalt();
         } else {
             System.out.format("Input file '%s' does not exist%n", this.options.getInputFile());
         }

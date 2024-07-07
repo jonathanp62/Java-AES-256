@@ -70,6 +70,8 @@ final class Salter {
 
         String result = null;
 
+        this.logger.debug("Will salt string: {}", this.string);
+
         this.logger.exit(result);
 
         return result;

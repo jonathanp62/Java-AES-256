@@ -99,6 +99,9 @@ final class Encrypter {
             this.logger.debug("Begin encrypting string: {}", this.options.getString());
         }
 
+        final Salter salter = new Salter(this.options.getUserId());
+        final String salt = salter.getSalt();
+
         this.logger.exit();
     }
 
@@ -115,7 +118,8 @@ final class Encrypter {
         }
 
         if (this.doesInputFileExist()) {
-
+            final Salter salter = new Salter(this.options.getUserId());
+            final String salt = salter.getSalt();
         } else {
             System.out.format("Input file '%s' does not exist%n", this.options.getInputFile());
         }
