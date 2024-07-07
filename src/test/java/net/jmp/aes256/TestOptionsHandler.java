@@ -238,4 +238,21 @@ public final class TestOptionsHandler {
         assertTrue(optionsHandler.containsOutputFile());
         assertTrue(optionsHandler.containsUserId());
     }
+
+    @Test
+    public void testOnlyUser() {
+        final var args = new String[] {"unknown", "--user", "jonathanp62@gmail.com"};
+        final var handler = new CommandLineHandler(args);
+
+        handler.handle();
+
+        assertEquals(CommandOperation.UNRECOGNIZED, handler.getCommandOperation());
+        assertTrue(handler.getCommandLine().isPresent());
+
+        final var optionsHandler = new OptionsHandler(handler.getCommandLine().get());
+
+        optionsHandler.handle();
+
+        assertFalse(optionsHandler.isHandled());
+    }
 }

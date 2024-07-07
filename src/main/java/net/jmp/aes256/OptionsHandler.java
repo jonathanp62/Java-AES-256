@@ -154,9 +154,13 @@ final class OptionsHandler {
             } else {
                 this.filesHandled();
             }
-        }
 
-        this.isHandled = true;
+            this.isHandled = true;
+        } else {
+            System.out.println("Neither --string nor --input-file options were specified");
+
+            result = false;
+        }
 
         this.logger.exit(result);
 

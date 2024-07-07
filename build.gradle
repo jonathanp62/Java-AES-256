@@ -257,3 +257,14 @@ tasks.register('execUnknown', JavaExec) {
     mainClass = javaMainClass
     standardInput = System.in
 }
+
+tasks.register('execUnknownOnlyUser', JavaExec) {
+    args('unknown', '--user', "jonathanp62@gmail.com")
+    allJvmArgs = [useAssertions, appConfigFile, logConfigFile] as List<String>
+    classpath = sourceSets.main.runtimeClasspath
+    description = execDescription
+    group = execGroup
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+    mainClass = javaMainClass
+    standardInput = System.in
+}
