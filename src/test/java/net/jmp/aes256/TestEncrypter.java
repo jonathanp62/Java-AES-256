@@ -59,6 +59,11 @@ public final class TestEncrypter {
                 .build();
     }
 
+    @Test(expected = NullPointerException.class)
+    public void testNull() {
+        new Encrypter(null);
+    }
+
     @Test
     public void testDoesInputFileExist() throws Exception {
         final var encrypter = new Encrypter(this.fileOptions);

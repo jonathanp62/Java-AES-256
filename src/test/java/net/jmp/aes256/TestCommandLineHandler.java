@@ -35,6 +35,11 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public final class TestCommandLineHandler {
+    @Test(expected = NullPointerException.class)
+    public void testNull() {
+        new CommandLineHandler(null);
+    }
+
     @Test
     public void testIsHandled() {
         final var args = new String[] {"encrypt", "--string", "The quick brown fox jumped over the lazy dog!"};

@@ -35,6 +35,11 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public final class TestOptionsHandler {
+    @Test(expected = NullPointerException.class)
+    public void testNull() {
+        new OptionsHandler(null);
+    }
+
     @Test
     public void testIsHandled() {
         final var args = new String[] {"decrypt", "--string", "The quick brown fox jumped over the lazy dog!"};

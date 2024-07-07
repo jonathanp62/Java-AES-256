@@ -58,6 +58,11 @@ public final class TestDecrypter {
                 .build();
     }
 
+    @Test(expected = NullPointerException.class)
+    public void testNull() {
+        new Decrypter(null);
+    }
+
     @Test
     public void testDoesInputFileExist() throws Exception {
         final var decrypter = new Decrypter(this.fileOptions);

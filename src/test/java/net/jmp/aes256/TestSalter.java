@@ -36,7 +36,27 @@ import static org.junit.Assert.*;
 
 public class TestSalter {
     @Test
-    public void testGetSalt() throws Exception {
-        assertTrue(1 == 1);
+    public void testGetSalt1() throws Exception {
+        final var salter = new Salter("jonathanmartinparker@somedomain.com");
+
+        final var expected = "WVcwNWRWbFlVbTlaVnpWMFdWaEtNR0ZYTlhkWldFcHlXbGhLUVdNeU9YUmFWMUoyWWxkR2NHSnBOV3BpTWpBOQ==";
+        final var result = salter.getSalt();
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void testGetSalt2() throws Exception {
+        final var salter = new Salter("jonathanp62@gmail.com");
+
+        final var expected = "WVcwNWRWbFlVbTlaVnpWM1RtcEtRVm95TVdoaFYzZDFXVEk1ZEE9PQ==";
+        final var result = salter.getSalt();
+
+        assertEquals(expected, result);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testGetSaltWithNull() throws Exception {
+        new Salter(null);
     }
 }

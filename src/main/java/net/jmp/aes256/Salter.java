@@ -30,7 +30,11 @@ package net.jmp.aes256;
  * SOFTWARE.
  */
 
+import java.io.UnsupportedEncodingException;
+
 import java.util.Objects;
+
+import org.apache.commons.codec.binary.Base64;
 
 import org.slf4j.LoggerFactory;
 
@@ -68,12 +72,28 @@ final class Salter {
     String getSalt() {
         this.logger.entry();
 
-        String result = null;
+        String unencodedString = this.string;
+        String encodedString = null;
 
-        this.logger.debug("Will salt string: {}", this.string);
+        if (this.logger.isDebugEnabled()) {
+            this.logger.debug("Unencoded string    : {}", this.string);
+            this.logger.debug("Using character set : {}", "UTF-8"); // @todo Configure
+            this.logger.debug("Number of iterations: {}", 3);       // @todo Configure
+        }
 
-        this.logger.exit(result);
+        try {
+            for (int i = 0; i < 3; i++) {   // @todo Configure
+                encodedString = Base64.encodeBase64String(unencodedString.getBytes("UTF-8"));   // @todo Configre
+                unencodedString = encodedString;
+            }
+        } catch (final UnsupportedEncodingException use) {
+            this.logger.catching(use);
+        }
 
-        return result;
+        this.logger.debug("Encoded string: {}", encodedString);
+
+        this.logger.exit(encodedString);
+
+        return encodedString;
     }
 }
