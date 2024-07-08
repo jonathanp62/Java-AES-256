@@ -99,7 +99,7 @@ public final class Main {
             this.processCommandLine(args);
 
             if (this.commandLine != null) {
-                this.handleCommandLine();
+                this.handleCommandLine(appConfig);
             }
         }, () -> this.logger.error("No configuration found for {}", Name.NAME_STRING));
 
@@ -164,9 +164,13 @@ public final class Main {
 
     /**
      * Handle the command line.
+     *
+     * @param   config  net.jmp.aes256.config.Config
      */
-    private void handleCommandLine() {
-        this.logger.entry();
+    private void handleCommandLine(final Config config) {
+        this.logger.entry(config);
+
+        assert config != null;
 
         /* Make sure all required options are provided */
 
@@ -177,7 +181,7 @@ public final class Main {
                 this.logger.debug(optionsHandler.toString());
             }
 
-            this.handleCommandLineOptions(optionsHandler);
+            this.handleCommandLineOptions(config, optionsHandler);
         }
 
         this.logger.exit();
@@ -186,10 +190,14 @@ public final class Main {
     /**
      * Handle the command line options.
      *
+     * @param   config          net.jmp.aes256.config.Config
      * @param   optionsHandler  net.jmp.aes256.OptionsHandler
      */
-    private void handleCommandLineOptions(final OptionsHandler optionsHandler) {
-        this.logger.entry(optionsHandler);
+    private void handleCommandLineOptions(final Config config, final OptionsHandler optionsHandler) {
+        this.logger.entry(config, optionsHandler);
+
+        assert config != null;
+        assert optionsHandler != null;
 
         final Options options = Builder.of(Options::new)
                 .with(Options::setString, (optionsHandler.containsString()) ? this.commandLine.getOptionValue("s") : null)
@@ -204,7 +212,7 @@ public final class Main {
                 this.logger.debug(options.toString());
             }
 
-            this.handleOperation(options);
+            this.handleOperation(config, options);
         }
 
         this.logger.exit();
@@ -288,19 +296,23 @@ public final class Main {
     /**
      * Handle the operation.
      *
+     * @param   config  net.jmp.aes256.config.Config
      * @param   options net.jmp.aes256.Options
      */
-    private void handleOperation(final Options options) {
-        this.logger.entry(options);
+    private void handleOperation(final Config config, final Options options) {
+        this.logger.entry(config, options);
+
+        assert config != null;
+        assert options != null;
 
         this.logger.debug("Handling argument: {}", this.commandOperation);
 
         switch (this.commandOperation) {
             case DECRYPT:
-                this.decrypt(options);
+                this.decrypt(config, options);
                 break;
             case ENCRYPT:
-                this.encrypt(options);
+                this.encrypt(config, options);
                 break;
             case UNRECOGNIZED:
                 System.out.format("Unrecognized argument: %s%n", this.commandOperation);
@@ -314,9 +326,15 @@ public final class Main {
 
     /**
      * Decrypt.
+     *
+     * @param   config  net.jmp.aes256.config.Config
+     * @param   options net.jmp.aes256.Options
      */
-    private void decrypt(final Options options) {
-        this.logger.entry(options);
+    private void decrypt(final Config config, final Options options) {
+        this.logger.entry(config, options);
+
+        assert config != null;
+        assert options != null;
 
         final Decrypter decrypter = new Decrypter(options);
 
@@ -327,9 +345,15 @@ public final class Main {
 
     /**
      * Encrypt.
+     *
+     * @param   config  net.jmp.aes256.config.Config
+     * @param   options net.jmp.aes256.Options
      */
-    private void encrypt(final Options options) {
-        this.logger.entry(options);
+    private void encrypt(final Config config, final Options options) {
+        this.logger.entry(config, options);
+
+        assert config != null;
+        assert options != null;
 
         final Encrypter encrypter = new Encrypter(options);
 
