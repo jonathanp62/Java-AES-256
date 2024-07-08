@@ -34,10 +34,12 @@
 	</description>
 
 	<property name="source.home" location="/Users/jonathan/IDEA-Projects/AES-256" />
+	<property name="source.config" location="${source.home}/config" />
 	<property name="source.libs" location="${source.home}/build/libs" />
 	<property name="source.version" value="0.3.0" />
 
 	<property name="target.home" location="/usr/local/aes256" />
+	<property name="target.config" location="${target.home}/config" />
 	<property name="target.libs" location="${target.home}/lib" />
 
 	<target name="check-jar-exists" unless="jar.file.exists">
@@ -46,6 +48,10 @@
 
 	<target name="copy-jar" depends="check-jar-exists" if="${jar.file.exists}">
 		<copy todir="${target.libs}" file="${source.libs}/aes-256-${source.version}.jar" />
+	</target>
+
+	<target name="copy-config">
+		<copy todir="${target.config}" file="${source.config}/config.json" />
 	</target>
 
 	<target name="info">
