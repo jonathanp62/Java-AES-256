@@ -32,7 +32,10 @@ package net.jmp.aes256;
  */
 
 import java.io.File;
+
 import java.util.Objects;
+
+import net.jmp.aes256.utils.Salter;
 
 import org.slf4j.LoggerFactory;
 

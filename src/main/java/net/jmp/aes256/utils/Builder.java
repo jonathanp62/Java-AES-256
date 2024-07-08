@@ -1,4 +1,4 @@
-package net.jmp.aes256;
+package net.jmp.aes256.utils;
 
 /*
  * (#)Builder.java  0.2.0   07/05/2024
@@ -38,7 +38,7 @@ import java.util.function.Supplier;
  *
  * @param   <T> The type of class instance to build
  */
-final class Builder<T> {
+public final class Builder<T> {
     /** The supplier for the new class instance. */
     private final Supplier<T> supplier;
 
@@ -60,7 +60,7 @@ final class Builder<T> {
      * @return              net.jmp.handoff.daemon.Builder&lt;T&gt;
      * @param   <T>         The type of class instance to build
      */
-    static <T> Builder<T> of(final Supplier<T> supplier) {
+    public static <T> Builder<T> of(final Supplier<T> supplier) {
         return new Builder<>(supplier);
     }
 
@@ -72,7 +72,7 @@ final class Builder<T> {
      * @return              net.jmp.handoff.daemon.Builder&lt;T&gt;
      * @param   <P>         The type of value being applied to the object
      */
-    <P> Builder<T> with(final BiConsumer<T, P> consumer, final P value) {
+    public <P> Builder<T> with(final BiConsumer<T, P> consumer, final P value) {
         return new Builder<>(() -> {
             final T object = this.supplier.get();
 
@@ -87,7 +87,7 @@ final class Builder<T> {
      *
      * @return  T
      */
-    T build() {
+    public T build() {
         return this.supplier.get();
     }
 }

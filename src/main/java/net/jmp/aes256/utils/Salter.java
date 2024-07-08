@@ -1,4 +1,4 @@
-package net.jmp.aes256;
+package net.jmp.aes256.utils;
 
 /*
  * (#)Salter.java   0.3.0   07/07/2024
@@ -44,7 +44,7 @@ import org.slf4j.ext.XLogger;
  * A class used to convert a string
  * into a Base64 encoded salt value.
  */
-final class Salter {
+public final class Salter {
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
 
@@ -63,13 +63,13 @@ final class Salter {
      *
      * @param   string  java.lang.String
      */
-    Salter(final String string) {
+    public Salter(final String string) {
         super();
 
         this.string = Objects.requireNonNull(string);
     }
 
-    String getSalt() {
+    public String getSalt() {
         this.logger.entry();
 
         String unencodedString = this.string;

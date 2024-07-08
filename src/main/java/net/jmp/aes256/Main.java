@@ -45,6 +45,8 @@ import java.util.Optional;
 
 import net.jmp.aes256.config.Config;
 
+import net.jmp.aes256.utils.Builder;
+
 import org.apache.commons.cli.CommandLine;
 
 import org.slf4j.LoggerFactory;
