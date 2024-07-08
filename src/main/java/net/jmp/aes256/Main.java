@@ -32,10 +32,18 @@ package net.jmp.aes256;
  * SOFTWARE.
  */
 
+import com.google.gson.Gson;
+
 import java.io.Console;
+import java.io.IOException;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import java.util.Arrays;
 import java.util.Optional;
+
+import net.jmp.aes256.config.Config;
 
 import org.apache.commons.cli.CommandLine;
 
@@ -87,19 +95,45 @@ public final class Main {
             this.logger.debug("{} {}", Name.NAME_STRING, Version.VERSION_STRING);
         }
 
-        this.processCommandLine(args);
+        this.getAppConfig().ifPresentOrElse(appConfig -> {
+            this.processCommandLine(args);
 
-        if (this.commandLine != null) {
-            this.handleCommandLine();
-        }
+            if (this.commandLine != null) {
+                this.handleCommandLine();
+            }
+        }, () -> this.logger.error("No configuration found for {}", Name.NAME_STRING));
 
         /*
-         * 1. Turn the Base 64 encoded user ID into salt for the forthcoming encryption (3 iterations) (See the NetBeans Base64Encoder project)
-         * 2. Always prompt for the password; this avoids storing it in a script (a unit test is ok)
-         * 3. The password provided serves as the secret key
+         * 1. The password provided serves as the secret key
          */
 
         this.logger.exit();
+    }
+
+    /**
+     * Get the application configuration.
+     *
+     * @return  java.lang.Optional&lt;net.jmp.aes256.Config&gt;
+     * @since   0.3.0
+     */
+    private Optional<Config> getAppConfig() {
+        this.logger.entry();
+
+        final String configFileName = System.getProperty("app.configurationFile", DEFAULT_APP_CONFIG_FILE);
+
+        this.logger.info("Reading the configuration from: {}", configFileName);
+
+        Config appConfig = null;
+
+        try {
+            appConfig = new Gson().fromJson(Files.readString(Paths.get(configFileName)), Config.class);
+        } catch (final IOException ioe) {
+            this.logger.catching(ioe);
+        }
+
+        this.logger.exit(appConfig);
+
+        return Optional.ofNullable(appConfig);
     }
 
     /**
