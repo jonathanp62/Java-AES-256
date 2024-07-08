@@ -1,4 +1,4 @@
-package net.jmp.aes256;
+package net.jmp.aes256.utils;
 
 /*
  * (#)TestSalter.java   0.3.0   07/07/2024

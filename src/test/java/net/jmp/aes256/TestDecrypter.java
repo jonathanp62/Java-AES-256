@@ -34,6 +34,8 @@ import java.io.File;
 
 import java.net.URL;
 
+import net.jmp.aes256.utils.Builder;
+
 import org.junit.Before;
 import org.junit.Test;
 
