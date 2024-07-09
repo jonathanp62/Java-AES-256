@@ -1,4 +1,4 @@
-package net.jmp.aes256;
+package net.jmp.aes256.crypto;
 
 /*
  * (#)Encrypter.java    0.3.0   07/06/2024
@@ -35,6 +35,8 @@ import java.io.File;
 
 import java.util.Objects;
 
+import net.jmp.aes256.Options;
+
 import net.jmp.aes256.utils.Salter;
 
 import org.slf4j.LoggerFactory;
@@ -44,7 +46,7 @@ import org.slf4j.ext.XLogger;
 /**
  * The encrypter class.
  */
-final class Encrypter {
+public final class Encrypter {
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
 
@@ -63,7 +65,7 @@ final class Encrypter {
      *
      * @param   options net.jmp.aes256.Options
      */
-    Encrypter(final Options options) {
+    public Encrypter(final Options options) {
         super();
 
         this.options = Objects.requireNonNull(options);
@@ -72,7 +74,7 @@ final class Encrypter {
     /**
      * The encrypt method.
      */
-    void encrypt() {
+    public void encrypt() {
         this.logger.entry();
 
         if (this.options.getString() != null) {

@@ -33,7 +33,7 @@ package net.jmp.aes256;
 /**
  * The final options class.
  */
-final class Options {
+public final class Options {
     /** The string value, if specified. */
     private String string;
 
@@ -52,7 +52,7 @@ final class Options {
     /**
      * The default constructor.
      */
-    Options() {
+    public Options() {
         super();
     }
 
@@ -61,7 +61,7 @@ final class Options {
      *
      * @return  java.lang.String
      */
-    String getString() {
+    public String getString() {
         return this.string;
     }
 
@@ -70,7 +70,7 @@ final class Options {
      *
      * @param   string  java.lang.String
      */
-    void setString(final String string) {
+    public void setString(final String string) {
         this.string = string;
     }
 
@@ -79,7 +79,7 @@ final class Options {
      *
      * @return  java.lang.String
      */
-    String getInputFile() {
+    public String getInputFile() {
         return this.inputFile;
     }
 
@@ -88,7 +88,7 @@ final class Options {
      *
      * @param   inputFile   java.lang.String
      */
-    void setInputFile(final String inputFile) {
+    public void setInputFile(final String inputFile) {
         this.inputFile = inputFile;
     }
 
@@ -97,7 +97,7 @@ final class Options {
      *
      * @return  java.lang.String
      */
-    String getOutputFile() {
+    public String getOutputFile() {
         return this.outputFile;
     }
 
@@ -106,7 +106,7 @@ final class Options {
      *
      * @param   outputFile  java.lang.String
      */
-    void setOutputFile(final String outputFile) {
+    public void setOutputFile(final String outputFile) {
         this.outputFile = outputFile;
     }
 
@@ -115,7 +115,7 @@ final class Options {
      *
      * @return  java.lang.String
      */
-    String getUserId() {
+    public String getUserId() {
         return this.userId;
     }
 
@@ -124,7 +124,7 @@ final class Options {
      *
      * @param   userId  java.lang.String
      */
-    void setUserId(final String userId) {
+    public void setUserId(final String userId) {
         this.userId = userId;
     }
 
@@ -133,7 +133,7 @@ final class Options {
      *
      * @return  java.lang.String
      */
-    String getPassword() {
+    public String getPassword() {
         return this.password;
     }
 
@@ -142,7 +142,7 @@ final class Options {
      *
      * @param   password    java.lang.String
      */
-    void setPassword(final String password) {
+    public void setPassword(final String password) {
         this.password = password;
     }
 

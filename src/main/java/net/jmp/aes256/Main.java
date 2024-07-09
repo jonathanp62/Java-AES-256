@@ -45,6 +45,9 @@ import java.util.Optional;
 
 import net.jmp.aes256.config.Config;
 
+import net.jmp.aes256.crypto.Decrypter;
+import net.jmp.aes256.crypto.Encrypter;
+
 import net.jmp.aes256.utils.Builder;
 
 import org.apache.commons.cli.CommandLine;

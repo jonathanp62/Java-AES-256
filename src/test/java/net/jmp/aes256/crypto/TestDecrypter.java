@@ -1,11 +1,11 @@
-package net.jmp.aes256;
+package net.jmp.aes256.crypto;
 
 /*
- * (#)TestEncrypter.java    0.3.0   07/06/2024
+ * (#)TestOptionsHandler.java   0.2.0   07/02/2024
  *
  * @author   Jonathan Parker
- * @version  0.3.0
- * @since    0.3.0
+ * @version  0.2.0
+ * @since    0.2.0
  *
  * MIT License
  *
@@ -34,20 +34,21 @@ import java.io.File;
 
 import java.net.URL;
 
+import net.jmp.aes256.Options;
+
 import net.jmp.aes256.utils.Builder;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
-public final class TestEncrypter {
+public final class TestDecrypter {
     private Options fileOptions;
 
     @Before
     public void before() {
-        final URL url = Thread.currentThread().getContextClassLoader().getResource("file-to-encrypt.xml");
+        final URL url = Thread.currentThread().getContextClassLoader().getResource("file-to-decrypt.bin");
 
         assert url != null;
 
@@ -56,7 +57,7 @@ public final class TestEncrypter {
         this.fileOptions = Builder.of(Options::new)
                 .with(Options::setString, null)
                 .with(Options::setInputFile, file.getAbsolutePath())
-                .with(Options::setOutputFile, "/Users/jonathan/IDEA-Projects/AES-256/out/encrypted-file.bin")
+                .with(Options::setOutputFile, "/Users/jonathan/IDEA-Projects/AES-256/out/decrypted-file.xml")
                 .with(Options::setUserId, "jonathanp62@gmail.com")
                 .with(Options::setPassword, "test-password")
                 .build();
@@ -64,23 +65,23 @@ public final class TestEncrypter {
 
     @Test(expected = NullPointerException.class)
     public void testNull() {
-        new Encrypter(null);
+        new Decrypter(null);
     }
 
     @Test
     public void testDoesInputFileExist() throws Exception {
-        final var encrypter = new Encrypter(this.fileOptions);
-        final var method = Encrypter.class.getDeclaredMethod("doesInputFileExist");
+        final var decrypter = new Decrypter(this.fileOptions);
+        final var method = Decrypter.class.getDeclaredMethod("doesInputFileExist");
 
         method.setAccessible(true);
 
-        Boolean result = (Boolean) method.invoke(encrypter);
+        Boolean result = (Boolean) method.invoke(decrypter);
 
         assertTrue(result);
 
-        this.fileOptions.setInputFile("/Users/jonathan/does-not-exist.txt");
+        this.fileOptions.setInputFile("config/does-not-exist.xml");
 
-        result = (Boolean) method.invoke(encrypter);
+        result = (Boolean) method.invoke(decrypter);
 
         assertFalse(result);
     }
