@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
+ (#)logback.xml 0.4.0   07/10/2024
  (#)logback.xml 0.3.0   07/07/2024
  (#)logback.xml 0.2.0   06/30/2024
  (#)logback.xml 0.1.0   06/27/2024
 
  @author   Jonathan Parker
- @version  0.3.0
+ @version  0.4.0
  @since    0.1.0
 
  MIT License
@@ -52,6 +53,9 @@
         <appender-ref ref="MAIN" />
     </logger>
     <logger name="net.jmp.aes256.input.OptionsHandler" additivity="false" level="info">
+        <appender-ref ref="MAIN" />
+    </logger>
+    <logger name="net.jmp.aes256.utils.Password" additivity="false" level="info">
         <appender-ref ref="MAIN" />
     </logger>
     <logger name="net.jmp.aes256.utils.Salter" additivity="false" level="info">
