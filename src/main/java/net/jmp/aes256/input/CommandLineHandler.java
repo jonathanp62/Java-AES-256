@@ -1,4 +1,4 @@
-package net.jmp.aes256;
+package net.jmp.aes256.input;
 
 /*
  * (#)CommandLineHandler.java   0.2.0   06/30/2024
@@ -43,7 +43,7 @@ import org.slf4j.ext.XLogger;
 /**
  * The class that handles the command line.
  */
-final class CommandLineHandler {
+public final class CommandLineHandler {
     /** Text for the illegal state exception. */
     private static final String NOT_HANDLED = "The command line arguments have not been handled";
 
@@ -68,7 +68,7 @@ final class CommandLineHandler {
      *
      * @param arguments java.lang.String[]
      */
-    CommandLineHandler(final String[] arguments) {
+    public CommandLineHandler(final String[] arguments) {
         super();
 
         this.arguments = Objects.requireNonNull(arguments);
@@ -78,7 +78,7 @@ final class CommandLineHandler {
      * Handle the command line arguments and
      * return an optional CommandLine object.
      */
-    void handle() {
+    public void handle() {
         this.logger.entry();
 
         if (this.logger.isDebugEnabled()) {
@@ -100,7 +100,7 @@ final class CommandLineHandler {
      *
      * @return  boolean
      */
-    boolean isHandled() {
+    public boolean isHandled() {
         return this.isHandled;
     }
 
@@ -109,7 +109,7 @@ final class CommandLineHandler {
      *
      * @return  net.jmp.aes256.CommandOperation
      */
-    CommandOperation getCommandOperation() {
+    public CommandOperation getCommandOperation() {
         if (this.isHandled) {
             return this.commandOperation;
         }
@@ -123,7 +123,7 @@ final class CommandLineHandler {
      *
      * @return  java.util.Optional&lt;org.apache.commons.cli.CommandLine&gt;
      */
-    Optional<CommandLine> getCommandLine() {
+    public Optional<CommandLine> getCommandLine() {
         if (this.isHandled) {
             return Optional.ofNullable(this.commandLine);
         } else {

@@ -34,7 +34,7 @@ import java.io.File;
 
 import java.net.URL;
 
-import net.jmp.aes256.Options;
+import net.jmp.aes256.input.Options;
 
 import net.jmp.aes256.utils.Builder;
 

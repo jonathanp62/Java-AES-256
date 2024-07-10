@@ -1,4 +1,4 @@
-package net.jmp.aes256;
+package net.jmp.aes256.input;
 
 /*
  * (#)TestOptionsHandler.java   0.2.0   07/02/2024

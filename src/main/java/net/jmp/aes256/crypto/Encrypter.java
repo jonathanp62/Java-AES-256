@@ -35,7 +35,7 @@ import java.io.File;
 
 import java.util.Objects;
 
-import net.jmp.aes256.Options;
+import net.jmp.aes256.input.Options;
 
 import net.jmp.aes256.utils.Salter;
 
@@ -101,7 +101,7 @@ public final class Encrypter {
         this.logger.entry();
 
         if (this.logger.isDebugEnabled()) {
-            this.logger.debug("Begin encrypting string: {}", this.options.getString());
+            this.logger.debug("Begin encrypting string: '{}'", this.options.getString());
         }
 
         final Salter salter = new Salter(this.options.getUserId());
@@ -119,7 +119,7 @@ public final class Encrypter {
         this.logger.entry();
 
         if (this.logger.isDebugEnabled()) {
-            this.logger.debug("Begin encrypting file: {}", this.options.getInputFile());
+            this.logger.debug("Begin encrypting file: '{}'", this.options.getInputFile());
         }
 
         if (this.doesInputFileExist()) {

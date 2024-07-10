@@ -1,4 +1,4 @@
-package net.jmp.aes256;
+package net.jmp.aes256.input;
 
 /*
  * (#)OptionsHandler.java   0.2.0   07/02/2024
@@ -30,19 +30,19 @@ package net.jmp.aes256;
  * SOFTWARE.
  */
 
+import java.util.Objects;
+
 import org.apache.commons.cli.CommandLine;
 
 import org.slf4j.LoggerFactory;
 
 import org.slf4j.ext.XLogger;
 
-import java.util.Objects;
-
 /**
  * The class that handles the validating the options
  * in terms of mutual exclusivity and co-dependence.
  */
-final class OptionsHandler {
+public final class OptionsHandler {
     /** Text for the illegal state exception. */
     private static final String NOT_HANDLED = "The options have not been handled";
 
@@ -72,7 +72,7 @@ final class OptionsHandler {
      *
      * @param   commandLine org.apache.commons.cli.CommandLine
      */
-    OptionsHandler(final CommandLine commandLine) {
+    public OptionsHandler(final CommandLine commandLine) {
         super();
 
         this.commandLine = Objects.requireNonNull(commandLine);
@@ -83,7 +83,7 @@ final class OptionsHandler {
      *
      * @return  boolean
      */
-    boolean containsString() {
+    public boolean containsString() {
         if (this.isHandled) {
             return this.hasString;
         } else {
@@ -96,7 +96,7 @@ final class OptionsHandler {
      *
      * @return  boolean
      */
-    boolean containsInputFile() {
+    public boolean containsInputFile() {
         if (this.isHandled) {
             return this.hasInputFile;
         } else {
@@ -109,7 +109,7 @@ final class OptionsHandler {
      *
      * @return  boolean
      */
-    boolean containsOutputFile() {
+    public boolean containsOutputFile() {
         if (this.isHandled) {
             return this.hasOutputFile;
         } else {
@@ -122,7 +122,7 @@ final class OptionsHandler {
      *
      * @return  boolean
      */
-    boolean containsUserId() {
+    public boolean containsUserId() {
         if (this.isHandled) {
             return this.hasUserId;
         } else {
@@ -135,7 +135,7 @@ final class OptionsHandler {
      *
      * @return  boolean
      */
-    boolean isHandled() {
+    public boolean isHandled() {
         return this.isHandled;
     }
 
@@ -143,7 +143,7 @@ final class OptionsHandler {
      * The handler. Return true if there were
      * no errors examining the options.
      */
-    boolean handle() {
+    public boolean handle() {
         this.logger.entry();
 
         boolean result = this.validateOptions();

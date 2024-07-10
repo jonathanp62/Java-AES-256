@@ -1,4 +1,4 @@
-package net.jmp.aes256;
+package net.jmp.aes256.input;
 
 /*
  * (#)CommandOperation.java 0.2.0   06/30/2024
