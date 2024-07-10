@@ -1,10 +1,11 @@
 /*
+ * (#)build.gradle  0.4.0   07/10/2024
  * (#)build.gradle  0.3.0   07/06/2024
  * (#)build.gradle  0.2.0   06/26/2024
  * (#)build.gradle  0.1.0   06/26/2024
  *
  * @author   Jonathan Parker
- * @version  0.3.0
+ * @version  0.4.0
  * @since    0.1.0
  *
  * MIT License
@@ -89,7 +90,7 @@ dependencies {
 }
 
 group = 'net.jmp.aes256'
-version = '0.3.0'
+version = '0.4.0'
 description = 'AES-256'
 
 println "The groupId is ${project.group}"
