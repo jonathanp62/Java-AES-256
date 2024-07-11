@@ -32,6 +32,9 @@ package net.jmp.aes256.utils;
 
 import java.util.Objects;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.slf4j.LoggerFactory;
 
 import org.slf4j.ext.XLogger;
@@ -50,11 +53,12 @@ public final class Password {
     /**
      * Validate the password.
      *
-     * @param   password    java.lang.String
-     * @throws              net.jmp.aes256.utils.PasswordException
+     * @param   password        java.lang.String
+     * @param   minimumLength   int
+     * @throws                  net.jmp.aes256.utils.PasswordException
      */
-    public void validate(final String password) throws PasswordException {
-        logger.entry(password);
+    public static void validate(final String password, final int minimumLength) throws PasswordException {
+        logger.entry(password, minimumLength);
 
         Objects.requireNonNull(password);
 
@@ -62,7 +66,7 @@ public final class Password {
         checkLowerCase(password);
         checkNumbers(password);
         checkSpecialCharacters(password);
-        checkLength(password);
+        checkLength(password, minimumLength);
 
         logger.exit();
     }
@@ -73,8 +77,17 @@ public final class Password {
      * @param   password    java.lang.String
      * @throws              net.jmp.aes256.utils.PasswordException
      */
-    private void checkUpperCase(final String password) throws PasswordException {
+    private static void checkUpperCase(final String password) throws PasswordException {
         logger.entry(password);
+
+        final String regex = "(?=(.*[A-Z]+))";
+        final Pattern pattern = Pattern.compile(regex);
+        final Matcher matcher = pattern.matcher(password);
+
+        if (!matcher.find()) {
+            throw new PasswordException("At least one uppercase letter must be specified: " + password);
+        }
+
         logger.exit();
     }
 
@@ -84,8 +97,17 @@ public final class Password {
      * @param   password    java.lang.String
      * @throws              net.jmp.aes256.utils.PasswordException
      */
-    private void checkLowerCase(final String password) throws PasswordException {
+    private static void checkLowerCase(final String password) throws PasswordException {
         logger.entry(password);
+
+        final String regex = "(?=(.*[a-z]+))";
+        final Pattern pattern = Pattern.compile(regex);
+        final Matcher matcher = pattern.matcher(password);
+
+        if (!matcher.find()) {
+            throw new PasswordException("At least one lowercase letter must be specified: " + password);
+        }
+
         logger.exit();
     }
 
@@ -95,8 +117,17 @@ public final class Password {
      * @param   password    java.lang.String
      * @throws              net.jmp.aes256.utils.PasswordException
      */
-    private void checkNumbers(final String password) throws PasswordException {
+    private static void checkNumbers(final String password) throws PasswordException {
         logger.entry(password);
+
+        final String regex = "(?=(.*[0-9]+))";
+        final Pattern pattern = Pattern.compile(regex);
+        final Matcher matcher = pattern.matcher(password);
+
+        if (!matcher.find()) {
+            throw new PasswordException("At least one number must be specified: " + password);
+        }
+
         logger.exit();
     }
 
@@ -106,19 +137,34 @@ public final class Password {
      * @param   password    java.lang.String
      * @throws              net.jmp.aes256.utils.PasswordException
      */
-    private void checkSpecialCharacters(final String password) throws PasswordException {
+    private static void checkSpecialCharacters(final String password) throws PasswordException {
         logger.entry(password);
+
+        final String regex = "(?=(.*[!@#$%^&*()\\-_+.,<>{}=\\[\\]\\\\|~`\\/'\"\\?]+))"; // @todo Missing ;:
+        final Pattern pattern = Pattern.compile(regex);
+        final Matcher matcher = pattern.matcher(password);
+
+        if (!matcher.find()) {
+            throw new PasswordException("At least one special character must be specified: " + password);
+        }
+
         logger.exit();
     }
 
     /**
      * Validate the length of the password.
      *
-     * @param   password    java.lang.String
-     * @throws              net.jmp.aes256.utils.PasswordException
+     * @param   password        java.lang.String
+     * @param   minimumLength   int
+     * @throws                  net.jmp.aes256.utils.PasswordException
      */
-    private void checkLength(final String password) throws PasswordException {
-        logger.entry(password);
+    private static void checkLength(final String password, final int minimumLength) throws PasswordException {
+        logger.entry(password, minimumLength);
+
+        if (password.length() < minimumLength) {
+            throw new PasswordException("The password must be equal to or greater than " + minimumLength + " characters");
+        }
+
         logger.exit();
     }
 }

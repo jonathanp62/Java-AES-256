@@ -35,33 +35,92 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class TestPassword {
+    private final String strongPassword = "someUppercaseWith123and()End";
+    private final int minimumLength = 20;
+
     @Test
     public void testValidPassword() {
-        assertTrue(true);
+        try {
+            Password.validate(this.strongPassword, this.minimumLength);
+        } catch (final PasswordException pe) {
+            fail(pe.getMessage());
+        }
     }
 
     @Test
-    public void testInvalidPasswordNoUppercaseLetters() {
-        assertTrue(true);
+    public void testForUppercaseLetters() {
+        try {
+            Password.validate(this.strongPassword, this.minimumLength);
+        } catch (final PasswordException pe) {
+            fail(pe.getMessage());
+        }
+    }
+
+    @Test(expected = PasswordException.class)
+    public void testInvalidPasswordNoUppercaseLetters() throws PasswordException {
+        Password.validate(this.strongPassword.toLowerCase(), this.minimumLength);
     }
 
     @Test
-    public void testInvalidPasswordNoLowercaseLetters() {
-        assertTrue(true);
+    public void testForLowercaseLetters() {
+        try {
+            Password.validate(this.strongPassword, this.minimumLength);
+        } catch (final PasswordException pe) {
+            fail(pe.getMessage());
+        }
+    }
+
+    @Test(expected = PasswordException.class)
+    public void testInvalidPasswordNoLowercaseLetters() throws PasswordException {
+        Password.validate(this.strongPassword.toUpperCase(), this.minimumLength);
     }
 
     @Test
-    public void testInvalidPasswordNoNumbers() {
-        assertTrue(true);
+    public void testForNumbers() {
+        try {
+            Password.validate(this.strongPassword, this.minimumLength);
+        } catch (final PasswordException pe) {
+            fail(pe.getMessage());
+        }
+    }
+
+    @Test(expected = PasswordException.class)
+    public void testInvalidPasswordNoNumbers() throws PasswordException {
+        Password.validate("someUppercaseWith[]and()End", this.minimumLength);
     }
 
     @Test
-    public void testInvalidPasswordNoSpecialCharacters() {
-        assertTrue(true);
+    public void testForSpecialCharacters() {
+        try {
+            Password.validate(this.strongPassword, this.minimumLength);
+        } catch (final PasswordException pe) {
+            fail(pe.getMessage());
+        }
+
+        try {
+            Password.validate("sU1~`!@#$%^&*()_-+={}[]<>,.?/", this.minimumLength);
+        } catch (final PasswordException pe) {
+            fail(pe.getMessage());
+        }
+
+    }
+
+    @Test(expected = PasswordException.class)
+    public void testInvalidPasswordNoSpecialCharacters() throws PasswordException {
+        Password.validate("someUppercaseWithand12345End", this.minimumLength);
     }
 
     @Test
-    public void testInvalidPasswordNotLongEnough() {
-        assertTrue(true);
+    public void testPasswordIsLongEnough() {
+        try {
+            Password.validate(this.strongPassword, this.minimumLength);
+        } catch (final PasswordException pe) {
+            fail(pe.getMessage());
+        }
+    }
+
+    @Test(expected = PasswordException.class)
+    public void testInvalidPasswordNotLongEnough() throws PasswordException {
+        Password.validate("someUpper'&%8", this.minimumLength);
     }
 }

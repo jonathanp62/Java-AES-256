@@ -30,5 +30,30 @@ package net.jmp.aes256.utils;
  * SOFTWARE.
  */
 
+import java.io.Serial;
+
+/**
+ * The password exception class. Only thrown when
+ * the password does not pass a validation.
+ */
 public class PasswordException extends Exception {
+    /** The serializable version identifier. */
+    @Serial
+    private static final long serialVersionUID = -1645636041731866764L;
+
+    /**
+     * The default constructor.
+     */
+    public PasswordException() {
+        throw new UnsupportedOperationException("The default constructor should not be used");
+    }
+
+    /**
+     * A constructor that takes a message.
+     *
+     * @param   message java.lang.String
+     */
+    public PasswordException(final String message) {
+        super(message);
+    }
 }

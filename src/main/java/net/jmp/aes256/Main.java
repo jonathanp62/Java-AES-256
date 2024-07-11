@@ -1,12 +1,13 @@
 package net.jmp.aes256;
 
 /*
+ * (#)Main.java 0.4.0   07/11/2024
  * (#)Main.java 0.3.0   07/06/2024
  * (#)Main.java 0.2.0   06/29/2024
  * (#)Main.java 0.1.0   06/27/2024
  *
  * @author   Jonathan Parker
- * @version  0.3.0
+ * @version  0.4.0
  * @since    0.1.0
  *
  * MIT License
@@ -51,6 +52,8 @@ import net.jmp.aes256.crypto.Encrypter;
 import net.jmp.aes256.input.*;
 
 import net.jmp.aes256.utils.Builder;
+import net.jmp.aes256.utils.Password;
+import net.jmp.aes256.utils.PasswordException;
 
 import org.apache.commons.cli.CommandLine;
 
@@ -287,7 +290,17 @@ public final class Main {
             final char[] password2 = console.readPassword();
 
             if (Arrays.equals(password1, password2)) {
-                result = Optional.of(new String(password1));
+                final var passwordString = new String(password1);
+
+                try {
+                    Password.validate(passwordString, 20);
+
+                    result = Optional.of(passwordString);
+                } catch (final PasswordException pe) {
+                    System.out.println(pe.getMessage());
+
+                    result = Optional.empty();
+                }
             } else {
                 System.out.println("The two (2) entered passwords do not match");
 
