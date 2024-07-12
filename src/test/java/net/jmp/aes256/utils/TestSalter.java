@@ -86,4 +86,20 @@ public class TestSalter {
 
         new net.jmp.aes256.utils.Salter(this.config);
     }
+
+    @Test
+    public void testLowercaseCharacterSet() {
+        final var salterConfig = this.config.getSalter();
+
+        salterConfig.setCharacterSet("utf-8");
+
+        new net.jmp.aes256.utils.Salter(this.config);
+
+        final var salter = new net.jmp.aes256.utils.Salter(this.config);
+
+        final var expected = "WVcwNWRWbFlVbTlaVnpWM1RtcEtRVm95TVdoaFYzZDFXVEk1ZEE9PQ==";
+        final var result = salter.getSalt("jonathanp62@gmail.com");
+
+        assertEquals(expected, result);
+    }
 }

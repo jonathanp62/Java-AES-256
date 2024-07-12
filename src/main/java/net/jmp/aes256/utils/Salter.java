@@ -74,7 +74,7 @@ public final class Salter {
 
         final var characterSets = CharacterSets.getInstance();
 
-        if (!characterSets.getCharacterSets().contains(this.config.getSalter().getCharacterSet())) {
+        if (!characterSets.getCharacterSets().contains(this.config.getSalter().getCharacterSet().toUpperCase())) {
             throw new SalterException("Character set '" + this.config.getSalter().getCharacterSet() + "' is not supported");
         }
     }
