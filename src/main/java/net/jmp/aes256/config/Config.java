@@ -1,10 +1,11 @@
 package net.jmp.aes256.config;
 
 /*
+ * (#)Config.java   0.4.0   07/12/2024
  * (#)Config.java   0.3.0   07/08/2024
  *
  * @author    Jonathan Parker
- * @version   0.3.0
+ * @version   0.4.0
  * @since     0.3.0
  *
  * MIT License
@@ -45,6 +46,10 @@ public final class Config {
     /** The salter component. */
     @SerializedName("salter")
     private Salter salter;
+
+    /** The minimum password length. @since 0.4.0 */
+    @SerializedName("password-minimum-length")
+    private int passwordMinimumLength;
 
     /** The number of iterations for password based encryption. */
     @SerializedName("pbe-key-spec-iterations")
@@ -96,6 +101,26 @@ public final class Config {
      */
     public void setSalter(final Salter salter) {
         this.salter = salter;
+    }
+
+    /**
+     * Return the minimum password length.
+     *
+     * @return  int
+     * @since   0.4.0
+     */
+    public int getPasswordMinimumLength() {
+        return this.passwordMinimumLength;
+    }
+
+    /**
+     * Set the minimum password length.
+     *
+     * @param   passwordMinimumLength   int
+     * @since                           0.4.0
+     */
+    public void setPasswordMinimumLength(final int passwordMinimumLength) {
+        this.passwordMinimumLength = passwordMinimumLength;
     }
 
     /**
@@ -184,7 +209,13 @@ public final class Config {
 
         final Config config = (Config) o;
 
-        return this.pbeKeySpecIterations == config.pbeKeySpecIterations && this.pbeKeySpecKeyLength == config.pbeKeySpecKeyLength && Objects.equals(this.cipher, config.cipher) && Objects.equals(this.salter, config.salter) && Objects.equals(this.secretKeyFactoryInstance, config.secretKeyFactoryInstance) && Objects.equals(this.secretKeySpecAlgorithm, config.secretKeySpecAlgorithm);
+        return this.passwordMinimumLength == config.passwordMinimumLength &&
+                this.pbeKeySpecIterations == config.pbeKeySpecIterations &&
+                this.pbeKeySpecKeyLength == config.pbeKeySpecKeyLength &&
+                Objects.equals(this.cipher, config.cipher) &&
+                Objects.equals(this.salter, config.salter) &&
+                Objects.equals(this.secretKeyFactoryInstance, config.secretKeyFactoryInstance) &&
+                Objects.equals(this.secretKeySpecAlgorithm, config.secretKeySpecAlgorithm);
     }
 
     /**
@@ -194,7 +225,13 @@ public final class Config {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(this.cipher, this.salter, this.pbeKeySpecIterations, this.pbeKeySpecKeyLength, this.secretKeyFactoryInstance, this.secretKeySpecAlgorithm);
+        return Objects.hash(this.cipher,
+                this.salter,
+                this.passwordMinimumLength,
+                this.pbeKeySpecIterations,
+                this.pbeKeySpecKeyLength,
+                this.secretKeyFactoryInstance,
+                this.secretKeySpecAlgorithm);
     }
 
     /**
@@ -207,6 +244,7 @@ public final class Config {
         return "Config{" +
                 "cipher=" + this.cipher +
                 ", salter=" + this.salter +
+                ", passwordMinimumLength=" + this.passwordMinimumLength +
                 ", pbeKeySpecIterations=" + this.pbeKeySpecIterations +
                 ", pbeKeySpecKeyLength=" + this.pbeKeySpecKeyLength +
                 ", secretKeyFactoryInstance='" + this.secretKeyFactoryInstance + '\'' +
