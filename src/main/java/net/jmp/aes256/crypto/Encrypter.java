@@ -155,6 +155,8 @@ public final class Encrypter {
 
         final IvParameterSpec ivParameterSpec = new IvParameterSpec(initializationVector);
 
+        // @todo Start SecretKeySpecBuilder.build(), constructor takes Config
+
         /* Set up the secret key */
 
         SecretKeyFactory secretKeyFactory;
@@ -184,6 +186,8 @@ public final class Encrypter {
                 secretKey.getEncoded(),
                 this.config.getSecretKeySpecAlgorithm()
         );
+
+        // @todo End SecretKeySpecBuilder.build()
 
         /* Set up the cipher */
 
