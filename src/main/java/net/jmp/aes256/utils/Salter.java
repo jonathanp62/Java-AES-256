@@ -35,6 +35,7 @@ import java.io.UnsupportedEncodingException;
 
 import java.util.Objects;
 
+import net.jmp.aes256.config.CharacterSets;
 import net.jmp.aes256.config.Config;
 
 import org.apache.commons.codec.binary.Base64;
@@ -70,6 +71,12 @@ public final class Salter {
         super();
 
         this.config = Objects.requireNonNull(config);
+
+        final var characterSets = CharacterSets.getInstance();
+
+        if (!characterSets.getCharacterSets().contains(this.config.getSalter().getCharacterSet())) {
+            throw new SalterException("Character set '" + this.config.getSalter().getCharacterSet() + "' is not supported");
+        }
     }
 
     /**

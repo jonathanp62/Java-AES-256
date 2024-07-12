@@ -77,4 +77,13 @@ public class TestSalter {
     public void testGetSaltWithNull() {
         new net.jmp.aes256.utils.Salter(null);
     }
+
+    @Test(expected = SalterException.class)
+    public void testUnsupportedCharacterSet() {
+        final var salter = this.config.getSalter();
+
+        salter.setCharacterSet("Not-Supported");
+
+        new net.jmp.aes256.utils.Salter(this.config);
+    }
 }
