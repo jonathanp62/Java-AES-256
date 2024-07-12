@@ -49,11 +49,18 @@ import static org.junit.Assert.*;
 public final class TestDecrypter {
     private Config config;
     private Options fileOptions;
+    private Options stringOptions;
 
     @Before
     public void before() {
-        // '6EfcoeWN2K3KP9tKtwsD9LNhGYD6XhBELtVRvt0+AM4pvBXabL2eUgcVHHncEgo7yH7QTOb+ZvZTOB4RUFTM0w=='
+        /* Set up the configuration */
+
         this.config = new Config();
+
+        final var cipher = new net.jmp.aes256.config.Cipher();
+
+        cipher.setCharacterSet("UTF-8");
+        cipher.setInstance("AES/CBC/PKCS5Padding");
 
         final var salter = new net.jmp.aes256.config.Salter();
 
@@ -61,6 +68,15 @@ public final class TestDecrypter {
         salter.setIterations(3);
 
         this.config.setSalter(salter);
+        this.config.setCipher(cipher);
+
+        this.config.setPasswordMinimumLength(20);
+        this.config.setPbeKeySpecIterations(65536);
+        this.config.setPbeKeySpecKeyLength(256);
+        this.config.setSecretKeyFactoryInstance("PBKDF2WithHmacSHA256");
+        this.config.setSecretKeySpecAlgorithm("AES");
+
+        /* Set up the file options */
 
         final URL url = Thread.currentThread().getContextClassLoader().getResource("file-to-decrypt.bin");
 
@@ -75,6 +91,16 @@ public final class TestDecrypter {
                 .with(Options::setUserId, "jonathanp62@gmail.com")
                 .with(Options::setPassword, "johann_Sebastian%Bach-6(Partitas)")
                 .build();
+
+        /* Set up the string options */
+
+        this.stringOptions = Builder.of(Options::new)
+                .with(Options::setString, "6EfcoeWN2K3KP9tKtwsD9LNhGYD6XhBELtVRvt0+AM4pvBXabL2eUgcVHHncEgo7yH7QTOb+ZvZTOB4RUFTM0w==")
+                .with(Options::setInputFile, null)
+                .with(Options::setOutputFile, null)
+                .with(Options::setUserId, "jonathanp62@gmail.com")
+                .with(Options::setPassword, "johann_Sebastian%Bach-6(Partitas)")
+                .build();
     }
 
     @Test(expected = NullPointerException.class)
@@ -85,6 +111,41 @@ public final class TestDecrypter {
     @Test(expected = NullPointerException.class)
     public void testNullOptions() {
         new Decrypter(this.config, null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidCipherCharacterSet() {
+        this.config.getCipher().setCharacterSet("us-ascii");
+
+        new Decrypter(this.config, this.stringOptions);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidCipherInstance() {
+        this.config.getCipher().setInstance("invalid");
+
+        new Decrypter(this.config, this.stringOptions);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidPBEKeyLength() {
+        this.config.setPbeKeySpecKeyLength(127);
+
+        new Decrypter(this.config, this.stringOptions);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidSecretKeySpecAlgorithm() {
+        this.config.setSecretKeySpecAlgorithm("invalid");
+
+        new Decrypter(this.config, this.stringOptions);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidSecretKeyFactoryInstance() {
+        this.config.setSecretKeyFactoryInstance("invalid");
+
+        new Decrypter(this.config, this.stringOptions);
     }
 
     @Test
@@ -103,5 +164,15 @@ public final class TestDecrypter {
         result = (Boolean) method.invoke(decrypter);
 
         assertFalse(result);
+    }
+
+    @Test
+    public void testEncryptString() throws Exception {
+        final var decrypter = new Decrypter(this.config, this.stringOptions);
+        final var decrypted = decrypter.decrypt();
+
+        assertTrue(decrypted.isPresent());
+
+        assertEquals("The quick brown fox jumped over the lazy dog!", decrypted.get());
     }
 }

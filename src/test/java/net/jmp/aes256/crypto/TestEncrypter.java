@@ -113,6 +113,41 @@ public final class TestEncrypter {
         new Encrypter(this.config, null);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidCipherCharacterSet() {
+        this.config.getCipher().setCharacterSet("us-ascii");
+
+        new Encrypter(this.config, this.stringOptions);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidCipherInstance() {
+        this.config.getCipher().setInstance("invalid");
+
+        new Encrypter(this.config, this.stringOptions);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidPBEKeyLength() {
+        this.config.setPbeKeySpecKeyLength(127);
+
+        new Encrypter(this.config, this.stringOptions);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidSecretKeySpecAlgorithm() {
+        this.config.setSecretKeySpecAlgorithm("invalid");
+
+        new Encrypter(this.config, this.stringOptions);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidSecretKeyFactoryInstance() {
+        this.config.setSecretKeyFactoryInstance("invalid");
+
+        new Encrypter(this.config, this.stringOptions);
+    }
+
     @Test
     public void testDoesInputFileExist() throws Exception {
         final var encrypter = new Encrypter(this.config, this.fileOptions);

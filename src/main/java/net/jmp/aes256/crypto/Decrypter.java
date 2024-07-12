@@ -34,7 +34,7 @@ package net.jmp.aes256.crypto;
 
 import java.io.File;
 
-import java.nio.charset.StandardCharsets;
+import java.io.UnsupportedEncodingException;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -237,7 +237,13 @@ public final class Decrypter {
             throw new CryptographyException("Unable to decrypt data", e);
         }
 
-        final String result = new String(decryptedData, StandardCharsets.UTF_8);
+        String result;
+
+        try {
+            result = new String(decryptedData, this.config.getCipher().getCharacterSet());
+        } catch (final UnsupportedEncodingException uee) {
+            throw new CryptographyException("Unable to stringify decrypted data", uee);
+        }
 
         this.logger.exit(result);
 
