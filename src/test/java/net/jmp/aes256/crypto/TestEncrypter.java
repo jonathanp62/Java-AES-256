@@ -44,8 +44,7 @@ import net.jmp.aes256.utils.Builder;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public final class TestEncrypter {
     private Config config;
@@ -72,8 +71,8 @@ public final class TestEncrypter {
         this.config.setCipher(cipher);
 
         this.config.setPasswordMinimumLength(20);
-        this.config.setPbeKeySpecIterations(256);
-        this.config.setPbeKeySpecKeyLength(65536);
+        this.config.setPbeKeySpecIterations(65536);
+        this.config.setPbeKeySpecKeyLength(256);
         this.config.setSecretKeyFactoryInstance("PBKDF2WithHmacSHA256");
         this.config.setSecretKeySpecAlgorithm("AES");
 
@@ -135,7 +134,17 @@ public final class TestEncrypter {
     @Test
     public void testEncryptString() throws Exception {
         final var encrypter = new Encrypter(this.config, this.stringOptions);
+        final var encrypted = encrypter.encrypt();
 
-        encrypter.encrypt();
+        assertTrue(encrypted.isPresent());
+
+        this.stringOptions.setString(encrypted.get());  // Decrypt the value return by encrypt
+
+        final var decrypter = new Decrypter(this.config, this.stringOptions);
+        final var decrypted = decrypter.decrypt();
+
+        assertTrue(decrypted.isPresent());
+
+        assertEquals("The quick brown fox jumped over the lazy dog!", decrypted.get());
     }
 }

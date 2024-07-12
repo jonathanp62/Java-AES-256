@@ -34,9 +34,27 @@ package net.jmp.aes256.crypto;
 
 import java.io.File;
 
+import java.nio.charset.StandardCharsets;
+
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
+
+import java.util.Base64;
 import java.util.Objects;
+import java.util.Optional;
+
+import javax.crypto.*;
+
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 
 import net.jmp.aes256.config.Config;
+import net.jmp.aes256.config.PBEKeyLengths;
 
 import net.jmp.aes256.input.Options;
 
@@ -77,16 +95,42 @@ public final class Decrypter {
 
         this.config = Objects.requireNonNull(config);
         this.options = Objects.requireNonNull(options);
+
+        if (!"UTF-8".equalsIgnoreCase(this.config.getCipher().getCharacterSet())) {
+            throw new IllegalArgumentException("The cipher character set must be UTF-8");
+        }
+
+        if (!"AES/CBC/PKCS5Padding".equalsIgnoreCase(this.config.getCipher().getInstance())) {
+            throw new IllegalArgumentException("The cipher instance must be AES/CBC/PKCS5Padding");
+        }
+
+        if (!PBEKeyLengths.getInstance().getKeyLengths().contains(this.config.getPbeKeySpecKeyLength())) {
+            throw new IllegalArgumentException("PBE key length " + this.config.getPbeKeySpecKeyLength() + " is not supported");
+        }
+
+        if (!"AES".equalsIgnoreCase(this.config.getSecretKeySpecAlgorithm())) {
+            throw new IllegalArgumentException("The secret key spec algorithm must be AES");
+        }
+
+        if (!"PBKDF2WithHmacSHA256".equalsIgnoreCase(this.config.getSecretKeyFactoryInstance())) {
+            throw new IllegalArgumentException("The secret key factory instance must be PBKDF2WithHmacSHA256");
+        }
     }
 
     /**
-     * The decrypt method.
+     * The decrypt method. An optional string
+     * is returned if the operation involved
+     * decrypting a string.
+     *
+     * @return  java.util.Optional&lt;java.lang.String&gt;
      */
-    public void decrypt() {
+    public Optional<String> decrypt() throws CryptographyException {
         this.logger.entry();
 
+        Optional<String> result = Optional.empty();
+
         if (this.options.getString() != null) {
-            this.decryptString();
+            result = Optional.of(this.decryptString());
         }
 
         if (this.options.getInputFile() != null && this.options.getOutputFile() != null) {
@@ -97,25 +141,107 @@ public final class Decrypter {
             this.logger.debug("End decryption");
         }
 
-        this.logger.exit();
+        this.logger.exit(result);
+
+        return result;
     }
 
     /**
      * Decrypt a string.
      *
+     * @return  java.lang.String
      * @since   0.3.0
      */
-    private void decryptString() {
+    private String decryptString() throws CryptographyException {
         this.logger.entry();
 
         if (this.logger.isDebugEnabled()) {
-            this.logger.debug("Begin decrypting string: '{}'", this.options.getString());
+            this.logger.debug("Begin decrypting string    : '{}'", this.options.getString());
+            this.logger.debug("Secret key factory instance: '{}'", this.config.getSecretKeyFactoryInstance());
+            this.logger.debug("Secret key spec algorithm  : '{}'", this.config.getSecretKeySpecAlgorithm());
+            this.logger.debug("Cipher instance            : '{}'", this.config.getCipher().getInstance());
+            this.logger.debug("Cipher character set       : '{}'", this.config.getCipher().getCharacterSet());
+            this.logger.debug("PBE key spec iterations    : {}", this.config.getPbeKeySpecIterations());
+            this.logger.debug("PBE key length             : {}", this.config.getPbeKeySpecKeyLength());
         }
 
         final Salter salter = new Salter(this.config);
         final String salt = salter.getSalt(this.options.getUserId());
 
-        this.logger.exit();
+        /* Set up the initialization vector from the previously encrypted data */
+
+        final byte[] encryptedData = Base64.getDecoder().decode(this.options.getString());
+        final byte[] initializationVector = new byte[16];
+
+        System.arraycopy(encryptedData, 0, initializationVector, 0, initializationVector.length);
+
+        final IvParameterSpec ivParameterSpec = new IvParameterSpec(initializationVector);
+
+        /* Set up the secret key */
+
+        SecretKeyFactory secretKeyFactory;
+
+        try {
+            secretKeyFactory = SecretKeyFactory.getInstance(this.config.getSecretKeyFactoryInstance());
+        } catch (final NoSuchAlgorithmException nsae) {
+            throw new CryptographyException("Unable to instantiate secret key factory: " + this.config.getSecretKeyFactoryInstance(), nsae);
+        }
+
+        final KeySpec keySpec = new PBEKeySpec(
+                this.options.getPassword().toCharArray(),
+                salt.getBytes(),
+                this.config.getPbeKeySpecIterations(),
+                this.config.getPbeKeySpecKeyLength()
+        );
+
+        SecretKey secretKey;
+
+        try {
+            secretKey = secretKeyFactory.generateSecret(keySpec);
+        } catch (final InvalidKeySpecException ikse) {
+            throw new CryptographyException("Unable to generate secret key", ikse);
+        }
+
+        final SecretKeySpec secretKeySpec = new SecretKeySpec(
+                secretKey.getEncoded(),
+                this.config.getSecretKeySpecAlgorithm()
+        );
+
+        /* Set up the cipher */
+
+        Cipher cipher;
+
+        try {
+            cipher = Cipher.getInstance(this.config.getCipher().getInstance());
+        } catch (final NoSuchAlgorithmException | NoSuchPaddingException e) {
+            throw new CryptographyException("Unable to instantiate cipher: " + this.config.getCipher().getInstance(), e);
+        }
+
+        try {
+            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
+        } catch (final InvalidKeyException | InvalidAlgorithmParameterException e) {
+            throw new CryptographyException("Unable to initialize cipher", e);
+        }
+
+        /* Perform the decryption */
+
+        final byte[] cipherText = new byte[encryptedData.length - 16];
+
+        System.arraycopy(encryptedData, 16, cipherText, 0, cipherText.length);
+
+        byte[] decryptedData;
+
+        try {
+            decryptedData = cipher.doFinal(cipherText);
+        } catch (final IllegalBlockSizeException | BadPaddingException e) {
+            throw new CryptographyException("Unable to decrypt data", e);
+        }
+
+        final String result = new String(decryptedData, StandardCharsets.UTF_8);
+
+        this.logger.exit(result);
+
+        return result;
     }
 
     /**

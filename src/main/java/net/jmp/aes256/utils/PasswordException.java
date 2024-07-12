@@ -36,7 +36,7 @@ import java.io.Serial;
  * The password exception class. Only thrown when
  * the password does not pass a validation.
  */
-public class PasswordException extends Exception {
+public final class PasswordException extends Exception {
     /** The serializable version identifier. */
     @Serial
     private static final long serialVersionUID = -1645636041731866764L;

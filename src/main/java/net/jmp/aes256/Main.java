@@ -46,6 +46,7 @@ import java.util.Optional;
 
 import net.jmp.aes256.config.Config;
 
+import net.jmp.aes256.crypto.CryptographyException;
 import net.jmp.aes256.crypto.Decrypter;
 import net.jmp.aes256.crypto.Encrypter;
 
@@ -412,7 +413,17 @@ public final class Main {
 
         final Decrypter decrypter = new Decrypter(config, options);
 
-        decrypter.decrypt();
+        Optional<String> result;
+
+        try {
+            result = decrypter.decrypt();
+        } catch (final CryptographyException ce) {
+            result = Optional.empty();
+
+            this.logger.catching(ce);
+        }
+
+        result.ifPresent(decrypted -> System.out.format("Decrypted: %s%n", decrypted));
 
         this.logger.exit();
     }
@@ -431,7 +442,17 @@ public final class Main {
 
         final Encrypter encrypter = new Encrypter(config, options);
 
-        encrypter.encrypt();
+        Optional<String> result;
+
+        try {
+            result = encrypter.encrypt();
+        } catch (final CryptographyException ce) {
+            result = Optional.empty();
+
+            this.logger.catching(ce);
+        }
+
+        result.ifPresent(encrypted -> System.out.format("Encrypted: %s%n", encrypted));
 
         this.logger.exit();
     }

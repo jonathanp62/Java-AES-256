@@ -52,6 +52,7 @@ public final class TestDecrypter {
 
     @Before
     public void before() {
+        // '6EfcoeWN2K3KP9tKtwsD9LNhGYD6XhBELtVRvt0+AM4pvBXabL2eUgcVHHncEgo7yH7QTOb+ZvZTOB4RUFTM0w=='
         this.config = new Config();
 
         final var salter = new net.jmp.aes256.config.Salter();

@@ -35,6 +35,7 @@ package net.jmp.aes256.crypto;
 import java.io.File;
 
 import java.io.UnsupportedEncodingException;
+
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -45,6 +46,7 @@ import java.security.spec.KeySpec;
 
 import java.util.Base64;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.crypto.*;
 
@@ -53,6 +55,7 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import net.jmp.aes256.config.Config;
+import net.jmp.aes256.config.PBEKeyLengths;
 
 import net.jmp.aes256.input.Options;
 
@@ -94,17 +97,41 @@ public final class Encrypter {
         this.config = Objects.requireNonNull(config);
         this.options = Objects.requireNonNull(options);
 
-        // @todo Validate the cipher's character set
+        if (!"UTF-8".equalsIgnoreCase(this.config.getCipher().getCharacterSet())) {
+            throw new IllegalArgumentException("The cipher character set must be UTF-8");
+        }
+
+        if (!"AES/CBC/PKCS5Padding".equalsIgnoreCase(this.config.getCipher().getInstance())) {
+            throw new IllegalArgumentException("The cipher instance must be AES/CBC/PKCS5Padding");
+        }
+
+        if (!PBEKeyLengths.getInstance().getKeyLengths().contains(this.config.getPbeKeySpecKeyLength())) {
+            throw new IllegalArgumentException("PBE key length " + this.config.getPbeKeySpecKeyLength() + " is not supported");
+        }
+
+        if (!"AES".equalsIgnoreCase(this.config.getSecretKeySpecAlgorithm())) {
+            throw new IllegalArgumentException("The secret key spec algorithm must be AES");
+        }
+
+        if (!"PBKDF2WithHmacSHA256".equalsIgnoreCase(this.config.getSecretKeyFactoryInstance())) {
+            throw new IllegalArgumentException("The secret key factory instance must be PBKDF2WithHmacSHA256");
+        }
     }
 
     /**
-     * The encrypt method.
+     * The encrypt method. An optional string
+     * is returned if the operation involved
+     * encrypting a string.
+     *
+     * @return  java.util.Optional&lt;java.lang.String&gt;
      */
-    public void encrypt() {
+    public Optional<String> encrypt() throws CryptographyException {
         this.logger.entry();
 
+        Optional<String> result = Optional.empty();
+
         if (this.options.getString() != null) {
-            this.encryptString();
+            result = Optional.of(this.encryptString());
         }
 
         if (this.options.getInputFile() != null && this.options.getOutputFile() != null) {
@@ -115,15 +142,18 @@ public final class Encrypter {
             this.logger.debug("End encryption");
         }
 
-        this.logger.exit();
+        this.logger.exit(result);
+
+        return result;
     }
 
     /**
      * Encrypt a string.
      *
+     * @return  java.lang.String
      * @since   0.3.0
      */
-    private void encryptString() {
+    private String encryptString() throws CryptographyException {
         this.logger.entry();
 
         if (this.logger.isDebugEnabled()) {
@@ -155,8 +185,7 @@ public final class Encrypter {
         try {
             secretKeyFactory = SecretKeyFactory.getInstance(this.config.getSecretKeyFactoryInstance());
         } catch (final NoSuchAlgorithmException nsae) {
-            this.logger.catching(nsae);
-            throw new RuntimeException(nsae.getMessage(), nsae);    // @todo CryptographyException?
+            throw new CryptographyException("Unable to instantiate secret key factory: " + this.config.getSecretKeyFactoryInstance(), nsae);
         }
 
         final KeySpec keySpec = new PBEKeySpec(
@@ -171,8 +200,7 @@ public final class Encrypter {
         try {
             secretKey = secretKeyFactory.generateSecret(keySpec);
         } catch (final InvalidKeySpecException ikse) {
-            this.logger.catching(ikse);
-            throw new RuntimeException(ikse.getMessage(), ikse);    // @todo CryptographyException?
+            throw new CryptographyException("Unable to generate secret key", ikse);
         }
 
         final SecretKeySpec secretKeySpec = new SecretKeySpec(
@@ -187,15 +215,13 @@ public final class Encrypter {
         try {
             cipher = Cipher.getInstance(this.config.getCipher().getInstance());
         } catch (final NoSuchAlgorithmException | NoSuchPaddingException e) {
-            this.logger.catching(e);
-            throw new RuntimeException(e.getMessage(), e);    // @todo CryptographyException?
+            throw new CryptographyException("Unable to instantiate cipher: " + this.config.getCipher().getInstance(), e);
         }
 
         try {
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
         } catch (final InvalidKeyException | InvalidAlgorithmParameterException e) {
-            this.logger.catching(e);
-            throw new RuntimeException(e.getMessage(), e);    // @todo CryptographyException?
+            throw new CryptographyException("Unable to initialize cipher", e);
         }
 
         /* Perform the encryption */
@@ -205,8 +231,7 @@ public final class Encrypter {
         try {
             cipherText = cipher.doFinal(this.options.getString().getBytes(this.config.getCipher().getCharacterSet()));
         } catch (final IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException e) {
-            this.logger.catching(e);
-            throw new RuntimeException(e.getMessage(), e);    // @todo CryptographyException?
+            throw new CryptographyException("Unable to encrypt data", e);
         }
 
         final byte[] encryptedData = new byte[initializationVector.length + cipherText.length];
@@ -216,9 +241,9 @@ public final class Encrypter {
 
         final String result = Base64.getEncoder().encodeToString(encryptedData);
 
-        System.out.println(result);
+        this.logger.exit(result);
 
-        this.logger.exit();
+        return result;
     }
 
     /**

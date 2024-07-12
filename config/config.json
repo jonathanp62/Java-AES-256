@@ -8,8 +8,8 @@
 		"iterations": 3
 	},
 	"password-minimum-length": 20,
-	"pbe-key-spec-iterations": 256,
-	"pbe-key-spec-key-length": 65536,
+	"pbe-key-spec-iterations": 65536,
+	"pbe-key-spec-key-length": 256,
 	"secret-key-factory-instance": "PBKDF2WithHmacSHA256",
 	"secret-key-spec-algorithm": "AES"
 }

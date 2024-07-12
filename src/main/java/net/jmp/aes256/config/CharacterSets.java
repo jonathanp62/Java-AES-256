@@ -34,7 +34,7 @@ import java.util.List;
 
 /**
  * A singleton class used to encapsulate
- * the list supported character sets for
+ * the list of supported character sets for
  * creating salt and performing cryptography.
  */
 public final class CharacterSets {
@@ -70,7 +70,7 @@ public final class CharacterSets {
     }
 
     /**
-     * Return the list of support character sets.
+     * Return the list of supported character sets.
      *
      * @return  java.util.List&lt;java.lang.String&gt;
      */

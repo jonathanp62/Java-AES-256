@@ -37,7 +37,7 @@ import java.io.Serial;
  * the character set specified in the configuration
  * is not supported.
  */
-public class SalterException extends RuntimeException {
+public final class SalterException extends RuntimeException {
     /** The serializable version identifier. */
     @Serial
     private static final long serialVersionUID = 929583556810974228L;
