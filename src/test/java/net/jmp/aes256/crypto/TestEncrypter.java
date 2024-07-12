@@ -53,8 +53,12 @@ public final class TestEncrypter {
 
     @Before
     public void before() {
-        /* Set up the configuration */
+        this.setupConfig();
+        this.setupFileOptions();
+        this.setupStringOptions();
+    }
 
+    private void setupConfig() {
         this.config = new Config();
 
         final var cipher = new net.jmp.aes256.config.Cipher();
@@ -75,9 +79,9 @@ public final class TestEncrypter {
         this.config.setPbeKeySpecKeyLength(256);
         this.config.setSecretKeyFactoryInstance("PBKDF2WithHmacSHA256");
         this.config.setSecretKeySpecAlgorithm("AES");
+    }
 
-        /* Set up the file options */
-
+    private void setupFileOptions() {
         final URL url = Thread.currentThread().getContextClassLoader().getResource("file-to-encrypt.xml");
 
         assert url != null;
@@ -91,9 +95,9 @@ public final class TestEncrypter {
                 .with(Options::setUserId, "jonathanp62@gmail.com")
                 .with(Options::setPassword, "johann_Sebastian%Bach-6(Partitas)")
                 .build();
+    }
 
-        /* Set up the string options */
-        
+    private void setupStringOptions() {
         this.stringOptions = Builder.of(Options::new)
                 .with(Options::setString, "The quick brown fox jumped over the lazy dog!")
                 .with(Options::setInputFile, null)
