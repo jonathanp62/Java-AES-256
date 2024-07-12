@@ -96,25 +96,7 @@ public final class Decrypter {
         this.config = Objects.requireNonNull(config);
         this.options = Objects.requireNonNull(options);
 
-        if (!"UTF-8".equalsIgnoreCase(this.config.getCipher().getCharacterSet())) {
-            throw new IllegalArgumentException("The cipher character set must be UTF-8");
-        }
-
-        if (!"AES/CBC/PKCS5Padding".equalsIgnoreCase(this.config.getCipher().getInstance())) {
-            throw new IllegalArgumentException("The cipher instance must be AES/CBC/PKCS5Padding");
-        }
-
-        if (!PBEKeyLengths.getInstance().getKeyLengths().contains(this.config.getPbeKeySpecKeyLength())) {
-            throw new IllegalArgumentException("PBE key length " + this.config.getPbeKeySpecKeyLength() + " is not supported");
-        }
-
-        if (!"AES".equalsIgnoreCase(this.config.getSecretKeySpecAlgorithm())) {
-            throw new IllegalArgumentException("The secret key spec algorithm must be AES");
-        }
-
-        if (!"PBKDF2WithHmacSHA256".equalsIgnoreCase(this.config.getSecretKeyFactoryInstance())) {
-            throw new IllegalArgumentException("The secret key factory instance must be PBKDF2WithHmacSHA256");
-        }
+        this.config.validate();
     }
 
     /**
@@ -157,12 +139,7 @@ public final class Decrypter {
 
         if (this.logger.isDebugEnabled()) {
             this.logger.debug("Begin decrypting string    : '{}'", this.options.getString());
-            this.logger.debug("Secret key factory instance: '{}'", this.config.getSecretKeyFactoryInstance());
-            this.logger.debug("Secret key spec algorithm  : '{}'", this.config.getSecretKeySpecAlgorithm());
-            this.logger.debug("Cipher instance            : '{}'", this.config.getCipher().getInstance());
-            this.logger.debug("Cipher character set       : '{}'", this.config.getCipher().getCharacterSet());
-            this.logger.debug("PBE key spec iterations    : {}", this.config.getPbeKeySpecIterations());
-            this.logger.debug("PBE key length             : {}", this.config.getPbeKeySpecKeyLength());
+            this.config.logCryptoSettings(this.logger);
         }
 
         final Salter salter = new Salter(this.config);

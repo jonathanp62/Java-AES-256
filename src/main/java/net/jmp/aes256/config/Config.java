@@ -33,6 +33,8 @@ package net.jmp.aes256.config;
 
 import com.google.gson.annotations.SerializedName;
 
+import org.slf4j.ext.XLogger;
+
 import java.util.Objects;
 
 /**
@@ -193,6 +195,51 @@ public final class Config {
      */
     public void setSecretKeySpecAlgorithm(final String secretKeySpecAlgorithm) {
         this.secretKeySpecAlgorithm = secretKeySpecAlgorithm;
+    }
+
+    /**
+     * Validate the configuration. Certain
+     * settings cannot be changed without testing.
+     *
+     * @since   0.4.0
+     */
+    public void validate() {
+        if (!"UTF-8".equalsIgnoreCase(this.cipher.getCharacterSet())) {
+            throw new IllegalArgumentException("The cipher character set must be UTF-8");
+        }
+
+        if (!"AES/CBC/PKCS5Padding".equalsIgnoreCase(this.cipher.getInstance())) {
+            throw new IllegalArgumentException("The cipher instance must be AES/CBC/PKCS5Padding");
+        }
+
+        if (!PBEKeyLengths.getInstance().getKeyLengths().contains(this.pbeKeySpecKeyLength)) {
+            throw new IllegalArgumentException("PBE key length " + this.pbeKeySpecKeyLength + " is not supported");
+        }
+
+        if (!"AES".equalsIgnoreCase(this.secretKeySpecAlgorithm)) {
+            throw new IllegalArgumentException("The secret key spec algorithm must be AES");
+        }
+
+        if (!"PBKDF2WithHmacSHA256".equalsIgnoreCase(this.secretKeyFactoryInstance)) {
+            throw new IllegalArgumentException("The secret key factory instance must be PBKDF2WithHmacSHA256");
+        }
+    }
+
+    /**
+     * Log the cryptography settings.
+     *
+     * @param   logger  org.slf4j.ext.XLogger
+     * @since           0.4.0
+     */
+    public void logCryptoSettings(final XLogger logger) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Secret key factory instance: '{}'", this.secretKeyFactoryInstance);
+            logger.debug("Secret key spec algorithm  : '{}'", this.secretKeySpecAlgorithm);
+            logger.debug("Cipher instance            : '{}'", this.cipher.getInstance());
+            logger.debug("Cipher character set       : '{}'", this.cipher.getCharacterSet());
+            logger.debug("PBE key spec iterations    : {}", this.pbeKeySpecIterations);
+            logger.debug("PBE key length             : {}", this.pbeKeySpecKeyLength);
+        }
     }
 
     /**
