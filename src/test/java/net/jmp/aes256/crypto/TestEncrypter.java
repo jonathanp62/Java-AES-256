@@ -50,10 +50,18 @@ import static org.junit.Assert.assertTrue;
 public final class TestEncrypter {
     private Config config;
     private Options fileOptions;
+    private Options stringOptions;
 
     @Before
     public void before() {
+        /* Set up the configuration */
+
         this.config = new Config();
+
+        final var cipher = new net.jmp.aes256.config.Cipher();
+
+        cipher.setCharacterSet("UTF-8");
+        cipher.setInstance("AES/CBC/PKCS5Padding");
 
         final var salter = new net.jmp.aes256.config.Salter();
 
@@ -61,6 +69,15 @@ public final class TestEncrypter {
         salter.setIterations(3);
 
         this.config.setSalter(salter);
+        this.config.setCipher(cipher);
+
+        this.config.setPasswordMinimumLength(20);
+        this.config.setPbeKeySpecIterations(256);
+        this.config.setPbeKeySpecKeyLength(65536);
+        this.config.setSecretKeyFactoryInstance("PBKDF2WithHmacSHA256");
+        this.config.setSecretKeySpecAlgorithm("AES");
+
+        /* Set up the file options */
 
         final URL url = Thread.currentThread().getContextClassLoader().getResource("file-to-encrypt.xml");
 
@@ -72,6 +89,16 @@ public final class TestEncrypter {
                 .with(Options::setString, null)
                 .with(Options::setInputFile, file.getAbsolutePath())
                 .with(Options::setOutputFile, "/Users/jonathan/IDEA-Projects/AES-256/out/encrypted-file.bin")
+                .with(Options::setUserId, "jonathanp62@gmail.com")
+                .with(Options::setPassword, "johann_Sebastian%Bach-6(Partitas)")
+                .build();
+
+        /* Set up the string options */
+        
+        this.stringOptions = Builder.of(Options::new)
+                .with(Options::setString, "The quick brown fox jumped over the lazy dog!")
+                .with(Options::setInputFile, null)
+                .with(Options::setOutputFile, null)
                 .with(Options::setUserId, "jonathanp62@gmail.com")
                 .with(Options::setPassword, "johann_Sebastian%Bach-6(Partitas)")
                 .build();
@@ -103,5 +130,12 @@ public final class TestEncrypter {
         result = (Boolean) method.invoke(encrypter);
 
         assertFalse(result);
+    }
+
+    @Test
+    public void testEncryptString() throws Exception {
+        final var encrypter = new Encrypter(this.config, this.stringOptions);
+
+        encrypter.encrypt();
     }
 }

@@ -175,7 +175,10 @@ public final class Encrypter {
             throw new RuntimeException(ikse.getMessage(), ikse);    // @todo CryptographyException?
         }
 
-        final SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getEncoded(), this.config.getSecretKeySpecAlgorithm());
+        final SecretKeySpec secretKeySpec = new SecretKeySpec(
+                secretKey.getEncoded(),
+                this.config.getSecretKeySpecAlgorithm()
+        );
 
         /* Set up the cipher */
 
