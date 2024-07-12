@@ -1,11 +1,12 @@
 package net.jmp.aes256.crypto;
 
 /*
+ * (#)Decrypter.java    0.4.0   07/12/2024
  * (#)Decrypter.java    0.3.0   07/06/2024
  * (#)Decrypter.java    0.2.0   07/05/2024
  *
  * @author   Jonathan Parker
- * @version  0.3.0
+ * @version  0.4.0
  * @since    0.2.0
  *
  * MIT License
@@ -35,6 +36,8 @@ import java.io.File;
 
 import java.util.Objects;
 
+import net.jmp.aes256.config.Config;
+
 import net.jmp.aes256.input.Options;
 
 import net.jmp.aes256.utils.Salter;
@@ -50,6 +53,9 @@ public final class Decrypter {
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
 
+    /** The configuration. @since 0.4.0 */
+    private final Config config;
+
     /** The options. */
     private final Options options;
 
@@ -61,13 +67,15 @@ public final class Decrypter {
     }
 
     /**
-     * A constructor that takes the options.
+     * A constructor that takes the configuration and options.
      *
-     * @param   options net.jmp.aes256.Options
+     * @param   config  net.jmp.aes256.config.Config
+     * @param   options net.jmp.aes256.input.Options
      */
-    public Decrypter(final Options options) {
+    public Decrypter(final Config config, final Options options) {
         super();
 
+        this.config = Objects.requireNonNull(config);
         this.options = Objects.requireNonNull(options);
     }
 
@@ -104,8 +112,8 @@ public final class Decrypter {
             this.logger.debug("Begin decrypting string: '{}'", this.options.getString());
         }
 
-        final Salter salter = new Salter(this.options.getUserId());
-        final String salt = salter.getSalt();
+        final Salter salter = new Salter(this.config);
+        final String salt = salter.getSalt(this.options.getUserId());
 
         this.logger.exit();
     }
@@ -123,8 +131,8 @@ public final class Decrypter {
         }
 
         if (this.doesInputFileExist()) {
-            final Salter salter = new Salter(this.options.getUserId());
-            final String salt = salter.getSalt();
+            final Salter salter = new Salter(this.config);
+            final String salt = salter.getSalt(this.options.getUserId());
         } else {
             System.out.format("Input file '%s' does not exist%n", this.options.getInputFile());
         }

@@ -1,10 +1,11 @@
 package net.jmp.aes256.utils;
 
 /*
+ * (#)TestSalter.java   0.4.0   07/12/2024
  * (#)TestSalter.java   0.3.0   07/07/2024
  *
  * @author   Jonathan Parker
- * @version  0.2.0
+ * @version  0.4.0
  * @since    0.2.0
  *
  * MIT License
@@ -30,33 +31,50 @@ package net.jmp.aes256.utils;
  * SOFTWARE.
  */
 
+import net.jmp.aes256.config.Config;
+
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class TestSalter {
+    private Config config;
+
+    @Before
+    public void before() {
+        this.config = new Config();
+
+        final var salter = new net.jmp.aes256.config.Salter();
+
+        salter.setCharacterSet("UTF-8");
+        salter.setIterations(3);
+
+        this.config.setSalter(salter);
+    }
+
     @Test
-    public void testGetSalt1() throws Exception {
-        final var salter = new Salter("jonathanmartinparker@somedomain.com");
+    public void testGetSalt1() {
+        final var salter = new net.jmp.aes256.utils.Salter(this.config);
 
         final var expected = "WVcwNWRWbFlVbTlaVnpWMFdWaEtNR0ZYTlhkWldFcHlXbGhLUVdNeU9YUmFWMUoyWWxkR2NHSnBOV3BpTWpBOQ==";
-        final var result = salter.getSalt();
+        final var result = salter.getSalt("jonathanmartinparker@somedomain.com");
 
         assertEquals(expected, result);
     }
 
     @Test
-    public void testGetSalt2() throws Exception {
-        final var salter = new Salter("jonathanp62@gmail.com");
+    public void testGetSalt2() {
+        final var salter = new net.jmp.aes256.utils.Salter(this.config);
 
         final var expected = "WVcwNWRWbFlVbTlaVnpWM1RtcEtRVm95TVdoaFYzZDFXVEk1ZEE9PQ==";
-        final var result = salter.getSalt();
+        final var result = salter.getSalt("jonathanp62@gmail.com");
 
         assertEquals(expected, result);
     }
 
     @Test(expected = NullPointerException.class)
-    public void testGetSaltWithNull() throws Exception {
-        new Salter(null);
+    public void testGetSaltWithNull() {
+        new net.jmp.aes256.utils.Salter(null);
     }
 }

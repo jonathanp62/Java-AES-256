@@ -410,7 +410,7 @@ public final class Main {
         assert config != null;
         assert options != null;
 
-        final Decrypter decrypter = new Decrypter(options);
+        final Decrypter decrypter = new Decrypter(config, options);
 
         decrypter.decrypt();
 
@@ -429,7 +429,7 @@ public final class Main {
         assert config != null;
         assert options != null;
 
-        final Encrypter encrypter = new Encrypter(options);
+        final Encrypter encrypter = new Encrypter(config, options);
 
         encrypter.encrypt();
 

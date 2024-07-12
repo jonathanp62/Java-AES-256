@@ -1,10 +1,11 @@
 package net.jmp.aes256.utils;
 
 /*
+ * (#)Salter.java   0.4.0   07/12/2024
  * (#)Salter.java   0.3.0   07/07/2024
  *
  * @author    Jonathan Parker
- * @version   0.3.0
+ * @version   0.4.0
  * @since     0.3.0
  *
  * MIT License
@@ -34,6 +35,8 @@ import java.io.UnsupportedEncodingException;
 
 import java.util.Objects;
 
+import net.jmp.aes256.config.Config;
+
 import org.apache.commons.codec.binary.Base64;
 
 import org.slf4j.LoggerFactory;
@@ -48,8 +51,8 @@ public final class Salter {
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
 
-    /** The string to produce salt from. */
-    private final String string;
+    /** The configuration. @since 0.4.0 */
+    private final Config config;
 
     /**
      * The default constructor.
@@ -59,31 +62,40 @@ public final class Salter {
     }
 
     /**
-     * A constructor that takes the options.
+     * A constructor that takes the configuration.
      *
-     * @param   string  java.lang.String
+     * @param   config  net.jmp.aes256.config.Config
      */
-    public Salter(final String string) {
+    public Salter(final Config config) {
         super();
 
-        this.string = Objects.requireNonNull(string);
+        this.config = Objects.requireNonNull(config);
     }
 
-    public String getSalt() {
-        this.logger.entry();
+    /**
+     * Return the salt from the specified string.
+     *
+     * @param   string  java.lang.String
+     * @return          java.lang.String
+     */
+    public String getSalt(final String string) {
+        this.logger.entry(string);
 
-        String unencodedString = this.string;
+        final String characterSet = this.config.getSalter().getCharacterSet();
+        final int iterations = this.config.getSalter().getIterations();
+
+        String unencodedString = string;
         String encodedString = null;
 
         if (this.logger.isDebugEnabled()) {
-            this.logger.debug("Unencoded string    : {}", this.string);
-            this.logger.debug("Using character set : {}", "UTF-8"); // @todo Configure
-            this.logger.debug("Number of iterations: {}", 3);       // @todo Configure
+            this.logger.debug("Unencoded string    : {}", string);
+            this.logger.debug("Using character set : {}", characterSet);
+            this.logger.debug("Number of iterations: {}", iterations);
         }
 
         try {
-            for (int i = 0; i < 3; i++) {   // @todo Configure
-                encodedString = Base64.encodeBase64String(unencodedString.getBytes("UTF-8"));   // @todo Configre
+            for (int i = 0; i < iterations; i++) {
+                encodedString = Base64.encodeBase64String(unencodedString.getBytes(characterSet));
                 unencodedString = encodedString;
             }
         } catch (final UnsupportedEncodingException use) {

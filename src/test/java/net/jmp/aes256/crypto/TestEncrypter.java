@@ -1,10 +1,11 @@
 package net.jmp.aes256.crypto;
 
 /*
+ * (#)TestEncrypter.java    0.4.0   07/12/2024
  * (#)TestEncrypter.java    0.3.0   07/06/2024
  *
  * @author   Jonathan Parker
- * @version  0.3.0
+ * @version  0.4.0
  * @since    0.3.0
  *
  * MIT License
@@ -34,6 +35,8 @@ import java.io.File;
 
 import java.net.URL;
 
+import net.jmp.aes256.config.Config;
+
 import net.jmp.aes256.input.Options;
 
 import net.jmp.aes256.utils.Builder;
@@ -45,10 +48,20 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public final class TestEncrypter {
+    private Config config;
     private Options fileOptions;
 
     @Before
     public void before() {
+        this.config = new Config();
+
+        final var salter = new net.jmp.aes256.config.Salter();
+
+        salter.setCharacterSet("UTF-8");
+        salter.setIterations(3);
+
+        this.config.setSalter(salter);
+
         final URL url = Thread.currentThread().getContextClassLoader().getResource("file-to-encrypt.xml");
 
         assert url != null;
@@ -60,18 +73,23 @@ public final class TestEncrypter {
                 .with(Options::setInputFile, file.getAbsolutePath())
                 .with(Options::setOutputFile, "/Users/jonathan/IDEA-Projects/AES-256/out/encrypted-file.bin")
                 .with(Options::setUserId, "jonathanp62@gmail.com")
-                .with(Options::setPassword, "test-password")
+                .with(Options::setPassword, "johann_Sebastian%Bach-6(Partitas)")
                 .build();
     }
 
     @Test(expected = NullPointerException.class)
-    public void testNull() {
-        new Encrypter(null);
+    public void testNullConfig() {
+        new Encrypter(null, this.fileOptions);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNullOptions() {
+        new Encrypter(this.config, null);
     }
 
     @Test
     public void testDoesInputFileExist() throws Exception {
-        final var encrypter = new Encrypter(this.fileOptions);
+        final var encrypter = new Encrypter(this.config, this.fileOptions);
         final var method = Encrypter.class.getDeclaredMethod("doesInputFileExist");
 
         method.setAccessible(true);

@@ -1,10 +1,11 @@
 package net.jmp.aes256.crypto;
 
 /*
+ * (#)TestOptionsHandler.java   0.4.0   07/12/2024
  * (#)TestOptionsHandler.java   0.2.0   07/02/2024
  *
  * @author   Jonathan Parker
- * @version  0.2.0
+ * @version  0.4.0
  * @since    0.2.0
  *
  * MIT License
@@ -34,6 +35,8 @@ import java.io.File;
 
 import java.net.URL;
 
+import net.jmp.aes256.config.Config;
+
 import net.jmp.aes256.input.Options;
 
 import net.jmp.aes256.utils.Builder;
@@ -44,10 +47,20 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public final class TestDecrypter {
+    private Config config;
     private Options fileOptions;
 
     @Before
     public void before() {
+        this.config = new Config();
+
+        final var salter = new net.jmp.aes256.config.Salter();
+
+        salter.setCharacterSet("UTF-8");
+        salter.setIterations(3);
+
+        this.config.setSalter(salter);
+
         final URL url = Thread.currentThread().getContextClassLoader().getResource("file-to-decrypt.bin");
 
         assert url != null;
@@ -59,18 +72,23 @@ public final class TestDecrypter {
                 .with(Options::setInputFile, file.getAbsolutePath())
                 .with(Options::setOutputFile, "/Users/jonathan/IDEA-Projects/AES-256/out/decrypted-file.xml")
                 .with(Options::setUserId, "jonathanp62@gmail.com")
-                .with(Options::setPassword, "test-password")
+                .with(Options::setPassword, "johann_Sebastian%Bach-6(Partitas)")
                 .build();
     }
 
     @Test(expected = NullPointerException.class)
-    public void testNull() {
-        new Decrypter(null);
+    public void testNullConfig() {
+        new Decrypter(null, this.fileOptions);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNullOptions() {
+        new Decrypter(this.config, null);
     }
 
     @Test
     public void testDoesInputFileExist() throws Exception {
-        final var decrypter = new Decrypter(this.fileOptions);
+        final var decrypter = new Decrypter(this.config, this.fileOptions);
         final var method = Decrypter.class.getDeclaredMethod("doesInputFileExist");
 
         method.setAccessible(true);
