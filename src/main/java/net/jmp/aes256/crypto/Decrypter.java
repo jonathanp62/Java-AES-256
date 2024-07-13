@@ -40,9 +40,6 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
-
 import java.util.Base64;
 import java.util.Objects;
 import java.util.Optional;
@@ -50,15 +47,14 @@ import java.util.Optional;
 import javax.crypto.*;
 
 import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import net.jmp.aes256.config.Config;
-import net.jmp.aes256.config.PBEKeyLengths;
 
 import net.jmp.aes256.input.Options;
 
 import net.jmp.aes256.utils.Salter;
+import net.jmp.aes256.utils.SecretKeySpecBuilder;
 
 import org.slf4j.LoggerFactory;
 
@@ -105,6 +101,7 @@ public final class Decrypter {
      * decrypting a string.
      *
      * @return  java.util.Optional&lt;java.lang.String&gt;
+     * @throws  net.jmp.aes256.crypto.CryptographyException
      */
     public Optional<String> decrypt() throws CryptographyException {
         this.logger.entry();
@@ -132,6 +129,7 @@ public final class Decrypter {
      * Decrypt a string.
      *
      * @return  java.lang.String
+     * @throws  net.jmp.aes256.crypto.CryptographyException
      * @since   0.3.0
      */
     private String decryptString() throws CryptographyException {
@@ -148,46 +146,17 @@ public final class Decrypter {
         /* Set up the initialization vector from the previously encrypted data */
 
         final byte[] encryptedData = Base64.getDecoder().decode(this.options.getString());
-        final byte[] initializationVector = new byte[16];
+        final byte[] initializationVector = new byte[Config.INITIALIZATION_VECTOR_SIZE];
 
         System.arraycopy(encryptedData, 0, initializationVector, 0, initializationVector.length);
 
         final IvParameterSpec ivParameterSpec = new IvParameterSpec(initializationVector);
 
-        // @todo Start SecretKeySpecBuilder.build(), constructor takes Config
+        /* Set up the secret key spec */
 
-        /* Set up the secret key */
+        final SecretKeySpecBuilder secretKeySpecBuilder = new SecretKeySpecBuilder(this.config);
+        final SecretKeySpec secretKeySpec = secretKeySpecBuilder.build(this.options.getPassword(), salt);
 
-        SecretKeyFactory secretKeyFactory;
-
-        try {
-            secretKeyFactory = SecretKeyFactory.getInstance(this.config.getSecretKeyFactoryInstance());
-        } catch (final NoSuchAlgorithmException nsae) {
-            throw new CryptographyException("Unable to instantiate secret key factory: " + this.config.getSecretKeyFactoryInstance(), nsae);
-        }
-
-        final KeySpec keySpec = new PBEKeySpec(
-                this.options.getPassword().toCharArray(),
-                salt.getBytes(),
-                this.config.getPbeKeySpecIterations(),
-                this.config.getPbeKeySpecKeyLength()
-        );
-
-        SecretKey secretKey;
-
-        try {
-            secretKey = secretKeyFactory.generateSecret(keySpec);
-        } catch (final InvalidKeySpecException ikse) {
-            throw new CryptographyException("Unable to generate secret key", ikse);
-        }
-
-        final SecretKeySpec secretKeySpec = new SecretKeySpec(
-                secretKey.getEncoded(),
-                this.config.getSecretKeySpecAlgorithm()
-        );
-
-        // @todo End SecretKeySpecBuilder.build()
-        
         /* Set up the cipher */
 
         Cipher cipher;
@@ -206,9 +175,9 @@ public final class Decrypter {
 
         /* Perform the decryption */
 
-        final byte[] cipherText = new byte[encryptedData.length - 16];
+        final byte[] cipherText = new byte[encryptedData.length - initializationVector.length];
 
-        System.arraycopy(encryptedData, 16, cipherText, 0, cipherText.length);
+        System.arraycopy(encryptedData, initializationVector.length, cipherText, 0, cipherText.length);
 
         byte[] decryptedData;
 

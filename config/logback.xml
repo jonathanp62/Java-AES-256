@@ -61,6 +61,9 @@
     <logger name="net.jmp.aes256.utils.Salter" additivity="false" level="info">
         <appender-ref ref="MAIN" />
     </logger>
+    <logger name="net.jmp.aes256.utils.SecretKeySpecBuilder" additivity="false" level="info">
+        <appender-ref ref="MAIN" />
+    </logger>
 
     <root level="info">
         <appender-ref ref="MAIN" />

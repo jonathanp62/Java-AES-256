@@ -41,6 +41,9 @@ import java.util.Objects;
  * The configuration class.
  */
 public final class Config {
+    /** The size of the initialization vector. */
+    public static int INITIALIZATION_VECTOR_SIZE = 16;
+
     /** The cipher component. */
     @SerializedName("cipher")
     private Cipher cipher;

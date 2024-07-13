@@ -41,9 +41,6 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
-
 import java.util.Base64;
 import java.util.Objects;
 import java.util.Optional;
@@ -51,15 +48,14 @@ import java.util.Optional;
 import javax.crypto.*;
 
 import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import net.jmp.aes256.config.Config;
-import net.jmp.aes256.config.PBEKeyLengths;
 
 import net.jmp.aes256.input.Options;
 
 import net.jmp.aes256.utils.Salter;
+import net.jmp.aes256.utils.SecretKeySpecBuilder;
 
 import org.slf4j.LoggerFactory;
 
@@ -106,6 +102,7 @@ public final class Encrypter {
      * encrypting a string.
      *
      * @return  java.util.Optional&lt;java.lang.String&gt;
+     * @throws  net.jmp.aes256.crypto.CryptographyException
      */
     public Optional<String> encrypt() throws CryptographyException {
         this.logger.entry();
@@ -133,6 +130,7 @@ public final class Encrypter {
      * Encrypt a string.
      *
      * @return  java.lang.String
+     * @throws  net.jmp.aes256.crypto.CryptographyException
      * @since   0.3.0
      */
     private String encryptString() throws CryptographyException {
@@ -149,45 +147,16 @@ public final class Encrypter {
         /* Set up the initialization vector */
 
         final SecureRandom secureRandom = new SecureRandom();
-        final byte[] initializationVector = new byte[16];
+        final byte[] initializationVector = new byte[Config.INITIALIZATION_VECTOR_SIZE];
 
         secureRandom.nextBytes(initializationVector);
 
         final IvParameterSpec ivParameterSpec = new IvParameterSpec(initializationVector);
 
-        // @todo Start SecretKeySpecBuilder.build(), constructor takes Config
+        /* Set up the secret key spec */
 
-        /* Set up the secret key */
-
-        SecretKeyFactory secretKeyFactory;
-
-        try {
-            secretKeyFactory = SecretKeyFactory.getInstance(this.config.getSecretKeyFactoryInstance());
-        } catch (final NoSuchAlgorithmException nsae) {
-            throw new CryptographyException("Unable to instantiate secret key factory: " + this.config.getSecretKeyFactoryInstance(), nsae);
-        }
-
-        final KeySpec keySpec = new PBEKeySpec(
-                this.options.getPassword().toCharArray(),
-                salt.getBytes(),
-                this.config.getPbeKeySpecIterations(),
-                this.config.getPbeKeySpecKeyLength()
-        );
-
-        SecretKey secretKey;
-
-        try {
-            secretKey = secretKeyFactory.generateSecret(keySpec);
-        } catch (final InvalidKeySpecException ikse) {
-            throw new CryptographyException("Unable to generate secret key", ikse);
-        }
-
-        final SecretKeySpec secretKeySpec = new SecretKeySpec(
-                secretKey.getEncoded(),
-                this.config.getSecretKeySpecAlgorithm()
-        );
-
-        // @todo End SecretKeySpecBuilder.build()
+        final SecretKeySpecBuilder secretKeySpecBuilder = new SecretKeySpecBuilder(this.config);
+        final SecretKeySpec secretKeySpec = secretKeySpecBuilder.build(this.options.getPassword(), salt);
 
         /* Set up the cipher */
 
