@@ -1,12 +1,13 @@
 package net.jmp.aes256.crypto;
 
 /*
+ * (#)Encrypter.java    0.5.0   07/13/2024
  * (#)Encrypter.java    0.4.0   07/12/2024
  * (#)Encrypter.java    0.3.0   07/06/2024
  * (#)Encrypter.java    0.2.0   07/05/2024
  *
  * @author   Jonathan Parker
- * @version  0.4.0
+ * @version  0.5.0
  * @since    0.2.0
  *
  * MIT License
