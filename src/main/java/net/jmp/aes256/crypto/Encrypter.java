@@ -32,9 +32,7 @@ package net.jmp.aes256.crypto;
  * SOFTWARE.
  */
 
-import java.io.File;
-
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -186,6 +184,8 @@ public final class Encrypter {
 
         final byte[] encryptedData = new byte[initializationVector.length + cipherText.length];
 
+        /* Copy the IV before the contents of the encrypted string (cipher text) */
+
         System.arraycopy(initializationVector, 0, encryptedData, 0, initializationVector.length);
         System.arraycopy(cipherText, 0, encryptedData, initializationVector.length, cipherText.length);
 
@@ -199,9 +199,10 @@ public final class Encrypter {
     /**
      * Encrypt a file.
      *
+     * @throws  net.jmp.aes256.crypto.CryptographyException
      * @since   0.3.0
      */
-    private void encryptFile() {
+    private void encryptFile() throws CryptographyException {
         this.logger.entry();
 
         if (this.logger.isDebugEnabled()) {
@@ -211,6 +212,68 @@ public final class Encrypter {
         if (this.doesInputFileExist()) {
             final Salter salter = new Salter(this.config);
             final String salt = salter.getSalt(this.options.getUserId());
+
+            /* Set up the initialization vector */
+
+            final SecureRandom secureRandom = new SecureRandom();
+            final byte[] initializationVector = new byte[Config.INITIALIZATION_VECTOR_SIZE];
+
+            secureRandom.nextBytes(initializationVector);
+
+            final IvParameterSpec ivParameterSpec = new IvParameterSpec(initializationVector);
+
+            /* Set up the secret key spec */
+
+            final SecretKeySpecBuilder secretKeySpecBuilder = new SecretKeySpecBuilder(this.config);
+            final SecretKeySpec secretKeySpec = secretKeySpecBuilder.build(this.options.getPassword(), salt);
+
+            /* Set up the cipher */
+
+            Cipher cipher;
+
+            try {
+                cipher = Cipher.getInstance(this.config.getCipher().getInstance());
+            } catch (final NoSuchAlgorithmException | NoSuchPaddingException e) {
+                throw new CryptographyException("Unable to instantiate cipher: " + this.config.getCipher().getInstance(), e);
+            }
+
+            try {
+                cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
+            } catch (final InvalidKeyException | InvalidAlgorithmParameterException e) {
+                throw new CryptographyException("Unable to initialize cipher", e);
+            }
+
+            try (final FileInputStream inputStream = new FileInputStream(this.options.getInputFile())) {
+                try (final FileOutputStream outputStream = new FileOutputStream(this.options.getOutputFile())) {
+                    /* Write the IV first */
+
+                    outputStream.write(initializationVector);
+
+                    final byte[] buffer = new byte[64];
+
+                    /* Write the cipher text */
+
+                    int bytesRead;
+
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        final byte[] output = cipher.update(buffer, 0, bytesRead);
+
+                        if (output != null) {
+                            outputStream.write(output);
+                        }
+                    }
+
+                    final byte[] output = cipher.doFinal();
+
+                    if (output != null) {
+                        outputStream.write(output);
+                    }
+                } catch (final IllegalBlockSizeException | BadPaddingException e) {
+                    throw new CryptographyException("Unable to encrypt data", e);
+                }
+            } catch (final IOException ioe) {
+                throw new CryptographyException("I/O error processing input file: " + this.options.getInputFile(), ioe);
+            }
         } else {
             System.out.format("Input file '%s' does not exist%n", this.options.getInputFile());
         }

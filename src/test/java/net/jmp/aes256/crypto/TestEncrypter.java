@@ -91,7 +91,7 @@ public final class TestEncrypter {
         this.fileOptions = Builder.of(Options::new)
                 .with(Options::setString, null)
                 .with(Options::setInputFile, file.getAbsolutePath())
-                .with(Options::setOutputFile, "/Users/jonathan/IDEA-Projects/AES-256/out/encrypted-file.bin")
+                .with(Options::setOutputFile, "/Users/jonathan/IDEA-Projects/AES-256/src/test/resources/file-to-decrypt.bin")
                 .with(Options::setUserId, "jonathanp62@gmail.com")
                 .with(Options::setPassword, "johann_Sebastian%Bach-6(Partitas)")
                 .build();
@@ -185,5 +185,32 @@ public final class TestEncrypter {
         assertTrue(decrypted.isPresent());
 
         assertEquals("The quick brown fox jumped over the lazy dog!", decrypted.get());
+    }
+
+    @Test
+    public void testEncryptFile() throws Exception {
+        final var encrypter = new Encrypter(this.config, this.fileOptions);
+        final var encrypted = encrypter.encrypt();
+
+        assertTrue(encrypted.isEmpty());
+
+        final URL url = Thread.currentThread().getContextClassLoader().getResource("file-to-decrypt.bin");
+
+        assertNotNull(url);
+
+        final File file = new File(url.getPath());
+
+        final var options = Builder.of(Options::new)
+                .with(Options::setString, null)
+                .with(Options::setInputFile, file.getAbsolutePath())
+                .with(Options::setOutputFile, "/Users/jonathan/IDEA-Projects/AES-256/out/file-to-encrypt.xml")
+                .with(Options::setUserId, "jonathanp62@gmail.com")
+                .with(Options::setPassword, "johann_Sebastian%Bach-6(Partitas)")
+                .build();
+
+        final var decrypter = new Decrypter(this.config, options);
+        final var decrypted = decrypter.decrypt();
+
+        assertTrue(decrypted.isEmpty());
     }
 }

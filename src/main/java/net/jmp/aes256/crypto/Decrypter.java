@@ -32,9 +32,7 @@ package net.jmp.aes256.crypto;
  * SOFTWARE.
  */
 
-import java.io.File;
-
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -173,7 +171,7 @@ public final class Decrypter {
             throw new CryptographyException("Unable to initialize cipher", e);
         }
 
-        /* Perform the decryption */
+        /* Perform the decryption - The cipher text does not contain the IV */
 
         final byte[] cipherText = new byte[encryptedData.length - initializationVector.length];
 
@@ -204,8 +202,9 @@ public final class Decrypter {
      * Decrypt a file.
      *
      * @since   0.3.0
+     * @throws  net.jmp.aes256.crypto.CryptographyException
      */
-    private void decryptFile() {
+    private void decryptFile() throws CryptographyException {
         this.logger.entry();
 
         if (this.logger.isDebugEnabled()) {
@@ -215,6 +214,80 @@ public final class Decrypter {
         if (this.doesInputFileExist()) {
             final Salter salter = new Salter(this.config);
             final String salt = salter.getSalt(this.options.getUserId());
+
+            /* Set up the initialization vector from the previously encrypted data */
+
+            final byte[] initializationVector = new byte[Config.INITIALIZATION_VECTOR_SIZE];
+
+            try (final FileInputStream inputStream = new FileInputStream(this.options.getInputFile())) {
+                final int bytesRead = inputStream.read(initializationVector, 0, Config.INITIALIZATION_VECTOR_SIZE);
+
+                if (bytesRead != Config.INITIALIZATION_VECTOR_SIZE) {
+                    throw new CryptographyException("Unable to read initialization vector");
+                }
+            } catch (final IOException ioe) {
+                throw new CryptographyException("I/O error processing input file: " + this.options.getInputFile(), ioe);
+            }
+
+            final IvParameterSpec ivParameterSpec = new IvParameterSpec(initializationVector);
+
+            /* Set up the secret key spec */
+
+            final SecretKeySpecBuilder secretKeySpecBuilder = new SecretKeySpecBuilder(this.config);
+            final SecretKeySpec secretKeySpec = secretKeySpecBuilder.build(this.options.getPassword(), salt);
+
+            /* Set up the cipher */
+
+            Cipher cipher;
+
+            try {
+                cipher = Cipher.getInstance(this.config.getCipher().getInstance());
+            } catch (final NoSuchAlgorithmException | NoSuchPaddingException e) {
+                throw new CryptographyException("Unable to instantiate cipher: " + this.config.getCipher().getInstance(), e);
+            }
+
+            try {
+                cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
+            } catch (final InvalidKeyException | InvalidAlgorithmParameterException e) {
+                throw new CryptographyException("Unable to initialize cipher", e);
+            }
+
+            try (final FileInputStream inputStream = new FileInputStream(this.options.getInputFile())) {
+                try (final FileOutputStream outputStream = new FileOutputStream(this.options.getOutputFile())) {
+                    final byte[] buffer = new byte[64];
+
+                    /* Skip over the IV */
+
+                    final long bytesSkipped = inputStream.skip(Config.INITIALIZATION_VECTOR_SIZE);
+
+                    if (bytesSkipped != Config.INITIALIZATION_VECTOR_SIZE) {
+                        throw new CryptographyException("Unable to read beyond initialization vector");
+                    }
+
+                    /* The remaining data is cipher text */
+
+                    int bytesRead;
+
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        final byte[] output = cipher.update(buffer, 0, bytesRead);
+
+                        if (output != null) {
+                            outputStream.write(output);
+                        }
+                    }
+
+                    final byte[] output = cipher.doFinal();
+
+                    if (output != null) {
+                        outputStream.write(output);
+                    }
+                } catch (final IllegalBlockSizeException | BadPaddingException e) {
+                    throw new CryptographyException("Unable to decrypt data", e);
+                }
+            } catch (final IOException ioe) {
+                throw new CryptographyException("I/O error processing input file: " + this.options.getInputFile(), ioe);
+            }
+
         } else {
             System.out.format("Input file '%s' does not exist%n", this.options.getInputFile());
         }

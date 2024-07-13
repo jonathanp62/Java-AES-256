@@ -5,4 +5,5 @@ gradle/*
 !gradle/libs.versions.toml
 gradlew
 out
+src/test/resources/file-to-decrypt.bin
 target

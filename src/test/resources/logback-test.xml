@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
+ (#)logback-test.xml    0.5.0   07/13/2024
  (#)logback-test.xml    0.3.0   07/07/2024
  (#)logback-test.xml    0.2.0   07/02/2024
 
  @author   Jonathan Parker
- @version  0.3.0
+ @version  0.5.0
  @since    0.2.0
 
  MIT License
@@ -54,6 +55,9 @@
         <appender-ref ref="MAIN" />
     </logger>
     <logger name="net.jmp.aes256.utils.Salter" additivity="false" level="debug">
+        <appender-ref ref="MAIN" />
+    </logger>
+    <logger name="net.jmp.aes256.utils.SecretKeySpecBuilder" additivity="false" level="debug">
         <appender-ref ref="MAIN" />
     </logger>
 
