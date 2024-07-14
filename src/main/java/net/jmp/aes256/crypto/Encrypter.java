@@ -145,11 +145,7 @@ public final class Encrypter {
 
         /* Set up the initialization vector */
 
-        final SecureRandom secureRandom = new SecureRandom();
-        final byte[] initializationVector = new byte[Config.INITIALIZATION_VECTOR_SIZE];
-
-        secureRandom.nextBytes(initializationVector);
-
+        final byte[] initializationVector = this.createInitializationVector();
         final IvParameterSpec ivParameterSpec = new IvParameterSpec(initializationVector);
 
         /* Set up the secret key spec */
@@ -159,19 +155,7 @@ public final class Encrypter {
 
         /* Set up the cipher */
 
-        Cipher cipher;
-
-        try {
-            cipher = Cipher.getInstance(this.config.getCipher().getInstance());
-        } catch (final NoSuchAlgorithmException | NoSuchPaddingException e) {
-            throw new CryptographyException("Unable to instantiate cipher: " + this.config.getCipher().getInstance(), e);
-        }
-
-        try {
-            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
-        } catch (final InvalidKeyException | InvalidAlgorithmParameterException e) {
-            throw new CryptographyException("Unable to initialize cipher", e);
-        }
+        final Cipher cipher = this.createCipher(secretKeySpec, ivParameterSpec);
 
         /* Perform the encryption */
 
@@ -216,11 +200,7 @@ public final class Encrypter {
 
             /* Set up the initialization vector */
 
-            final SecureRandom secureRandom = new SecureRandom();
-            final byte[] initializationVector = new byte[Config.INITIALIZATION_VECTOR_SIZE];
-
-            secureRandom.nextBytes(initializationVector);
-
+            final byte[] initializationVector = this.createInitializationVector();
             final IvParameterSpec ivParameterSpec = new IvParameterSpec(initializationVector);
 
             /* Set up the secret key spec */
@@ -230,19 +210,9 @@ public final class Encrypter {
 
             /* Set up the cipher */
 
-            Cipher cipher;
+            final Cipher cipher = this.createCipher(secretKeySpec, ivParameterSpec);
 
-            try {
-                cipher = Cipher.getInstance(this.config.getCipher().getInstance());
-            } catch (final NoSuchAlgorithmException | NoSuchPaddingException e) {
-                throw new CryptographyException("Unable to instantiate cipher: " + this.config.getCipher().getInstance(), e);
-            }
-
-            try {
-                cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
-            } catch (final InvalidKeyException | InvalidAlgorithmParameterException e) {
-                throw new CryptographyException("Unable to initialize cipher", e);
-            }
+            /* Perform the encryption */
 
             try (final FileInputStream inputStream = new FileInputStream(this.options.getInputFile())) {
                 try (final FileOutputStream outputStream = new FileOutputStream(this.options.getOutputFile())) {
@@ -280,6 +250,59 @@ public final class Encrypter {
         }
 
         this.logger.exit();
+    }
+
+    /**
+     * Create and return the initialization vector.
+     *
+     * @return  byte[]
+     * @since   0.5.0
+     */
+    private byte[] createInitializationVector() {
+        this.logger.entry();
+
+        final SecureRandom secureRandom = new SecureRandom();
+        final byte[] initializationVector = new byte[Config.INITIALIZATION_VECTOR_SIZE];
+
+        secureRandom.nextBytes(initializationVector);
+
+        this.logger.exit(initializationVector);
+
+        return initializationVector;
+    }
+
+    /**
+     * Create and return the cipher.
+     *
+     * @param   secretKeySpec   javax.crypto.spec.SecretKeySpec
+     * @param   ivParameterSpec javax.crypto.spec.IvParameterSpec
+     * @return                  javax.crypto.Cipher
+     * @throws                  net.jmp.aes256.crypto.CryptographyException
+     * @since                   0.5.0
+     */
+    private Cipher createCipher(final SecretKeySpec secretKeySpec, final IvParameterSpec ivParameterSpec) throws CryptographyException {
+        this.logger.entry(secretKeySpec, ivParameterSpec);
+
+        assert secretKeySpec != null;
+        assert ivParameterSpec != null;
+
+        Cipher cipher;
+
+        try {
+            cipher = Cipher.getInstance(this.config.getCipher().getInstance());
+        } catch (final NoSuchAlgorithmException | NoSuchPaddingException e) {
+            throw new CryptographyException("Unable to instantiate cipher: " + this.config.getCipher().getInstance(), e);
+        }
+
+        try {
+            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
+        } catch (final InvalidKeyException | InvalidAlgorithmParameterException e) {
+            throw new CryptographyException("Unable to initialize cipher", e);
+        }
+
+        this.logger.exit(cipher);
+
+        return cipher;
     }
 
     /**
