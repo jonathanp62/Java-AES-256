@@ -32,21 +32,16 @@ package net.jmp.aes256.crypto;
  * SOFTWARE.
  */
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 
 import java.net.URL;
-
-import java.nio.charset.StandardCharsets;
-
-import java.security.MessageDigest;
 
 import net.jmp.aes256.config.Config;
 
 import net.jmp.aes256.input.Options;
 
 import net.jmp.aes256.utils.Builder;
+import net.jmp.aes256.utils.SHA256;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -54,13 +49,6 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public final class TestDecrypter {
-    private static final byte[] HEX_CHARACTER_TABLE = {
-            (byte)'0', (byte)'1', (byte)'2', (byte)'3',
-            (byte)'4', (byte)'5', (byte)'6', (byte)'7',
-            (byte)'8', (byte)'9', (byte)'a', (byte)'b',
-            (byte)'c', (byte)'d', (byte)'e', (byte)'f'
-    };
-
     private Config config;
     private Options fileOptions;
     private Options stringOptions;
@@ -196,7 +184,7 @@ public final class TestDecrypter {
 
     @Test
     public void testDecryptFile() throws Exception {
-        final var originalFileSha256 = this.getSha256OfFile("/Users/jonathan/IDEA-Projects/AES-256/src/test/resources/Most-Popular-Team-By-State.png");
+        final var originalFileSha256 = SHA256.getFileSHA256("/Users/jonathan/IDEA-Projects/AES-256/src/test/resources/Most-Popular-Team-By-State.png");
 
         final var decrypter = new Decrypter(this.config, this.fileOptions);
         final var decrypted = decrypter.decrypt();
@@ -205,42 +193,8 @@ public final class TestDecrypter {
 
         /* Compare the original and decrypted file's SHA256 checksums */
 
-        final var decryptedFileSha256 = this.getSha256OfFile(this.fileOptions.getOutputFile());
+        final var decryptedFileSha256 = SHA256.getFileSHA256(this.fileOptions.getOutputFile());
 
         assertEquals(originalFileSha256, decryptedFileSha256);
-    }
-
-    private String getSha256OfFile(final String fileName) throws Exception {
-        assertNotNull(fileName);
-
-        final MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        final byte[] buffer = new byte[8192];
-
-        int count;
-
-        try (final BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(fileName))) {
-            while ((count = inputStream.read(buffer)) > 0) {
-                digest.update(buffer, 0, count);
-            }
-        }
-
-        return this.bytesToHexString(digest.digest());
-    }
-
-    private String bytesToHexString(final byte[] bytes) {
-        assertNotNull(bytes);
-
-        final byte[] hex = new byte[2 * bytes.length];
-
-        int index = 0;
-
-        for (byte b : bytes) {
-            int v = b & 0xFF;
-
-            hex[index++] = HEX_CHARACTER_TABLE[v >>> 4];
-            hex[index++] = HEX_CHARACTER_TABLE[v & 0xF];
-        }
-
-        return new String(hex, StandardCharsets.US_ASCII);
     }
 }
