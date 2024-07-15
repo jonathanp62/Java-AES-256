@@ -232,45 +232,65 @@ public final class Decrypter {
             /* Perform the decryption */
 
             try (final FileInputStream inputStream = new FileInputStream(this.options.getInputFile())) {
-                try (final FileOutputStream outputStream = new FileOutputStream(this.options.getOutputFile())) {
-                    final byte[] buffer = new byte[64];
-
-                    /* Skip over the IV */
-
-                    final long bytesSkipped = inputStream.skip(Config.INITIALIZATION_VECTOR_SIZE);
-
-                    if (bytesSkipped != Config.INITIALIZATION_VECTOR_SIZE) {
-                        throw new CryptographyException("Unable to read beyond initialization vector");
-                    }
-
-                    /* The remaining data is cipher text */
-
-                    int bytesRead;
-
-                    while ((bytesRead = inputStream.read(buffer)) != -1) {
-                        final byte[] output = cipher.update(buffer, 0, bytesRead);
-
-                        if (output != null) {
-                            outputStream.write(output);
-                        }
-                    }
-
-                    final byte[] output = cipher.doFinal();
-
-                    if (output != null) {
-                        outputStream.write(output);
-                    }
-                } catch (final IllegalBlockSizeException | BadPaddingException e) {
-                    throw new CryptographyException("Unable to decrypt data", e);
-                }
+                this.decryptFileData(cipher, inputStream);
             } catch (final IOException ioe) {
                 throw new CryptographyException("I/O error processing input file: " + this.options.getInputFile(), ioe);
             }
-
         } else {
             System.out.format("Input file '%s' does not exist%n", this.options.getInputFile());
         }
         
+        this.logger.exit();
+    }
+
+    /**
+     * Encrypt the file data.
+     *
+     * @param   cipher                  javax.crypto.Cipher
+     * @param   inputStream             java.io.InputStream
+     * @throws                          net.jmp.aes256.crypto.CryptographyException
+     * @since                           0.5.0
+     */
+    private void decryptFileData(final Cipher cipher, final InputStream inputStream) throws CryptographyException {
+        this.logger.entry(cipher, inputStream);
+
+        assert cipher != null;
+        assert inputStream != null;
+
+        try (final FileOutputStream outputStream = new FileOutputStream(this.options.getOutputFile())) {
+            final byte[] buffer = new byte[64];
+
+            /* Skip over the IV */
+
+            final long bytesSkipped = inputStream.skip(Config.INITIALIZATION_VECTOR_SIZE);
+
+            if (bytesSkipped != Config.INITIALIZATION_VECTOR_SIZE) {
+                throw new CryptographyException("Unable to read beyond initialization vector");
+            }
+
+            /* The remaining data is cipher text */
+
+            int bytesRead;
+
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                final byte[] output = cipher.update(buffer, 0, bytesRead);
+
+                if (output != null) {
+                    outputStream.write(output);
+                }
+            }
+
+            final byte[] output = cipher.doFinal();
+
+            if (output != null) {
+                outputStream.write(output);
+            }
+        } catch (final IOException ioe) {
+            throw new CryptographyException("I/O error processing output file: " + this.options.getOutputFile(), ioe);
+        } catch (final IllegalBlockSizeException | BadPaddingException e) {
+            throw new CryptographyException("Unable to decrypt data", e);
+        }
+
         this.logger.exit();
     }
 

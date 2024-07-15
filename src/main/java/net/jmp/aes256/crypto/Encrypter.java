@@ -215,38 +215,61 @@ public final class Encrypter {
             /* Perform the encryption */
 
             try (final FileInputStream inputStream = new FileInputStream(this.options.getInputFile())) {
-                try (final FileOutputStream outputStream = new FileOutputStream(this.options.getOutputFile())) {
-                    /* Write the IV first */
-
-                    outputStream.write(initializationVector);
-
-                    final byte[] buffer = new byte[64];
-
-                    /* Write the cipher text */
-
-                    int bytesRead;
-
-                    while ((bytesRead = inputStream.read(buffer)) != -1) {
-                        final byte[] output = cipher.update(buffer, 0, bytesRead);
-
-                        if (output != null) {
-                            outputStream.write(output);
-                        }
-                    }
-
-                    final byte[] output = cipher.doFinal();
-
-                    if (output != null) {
-                        outputStream.write(output);
-                    }
-                } catch (final IllegalBlockSizeException | BadPaddingException e) {
-                    throw new CryptographyException("Unable to encrypt data", e);
-                }
+                this.encryptFileData(initializationVector, cipher, inputStream);
             } catch (final IOException ioe) {
                 throw new CryptographyException("I/O error processing input file: " + this.options.getInputFile(), ioe);
             }
         } else {
             System.out.format("Input file '%s' does not exist%n", this.options.getInputFile());
+        }
+
+        this.logger.exit();
+    }
+
+    /**
+     * Encrypt the file data.
+     *
+     * @param   initializationVector    byte[]
+     * @param   cipher                  javax.crypto.Cipher
+     * @param   inputStream             java.io.InputStream
+     * @throws                          net.jmp.aes256.crypto.CryptographyException
+     * @since                           0.5.0
+     */
+    private void encryptFileData(final byte[] initializationVector, final Cipher cipher, final InputStream inputStream) throws CryptographyException {
+        this.logger.entry(initializationVector, cipher, inputStream);
+
+        assert initializationVector != null;
+        assert cipher != null;
+        assert inputStream != null;
+
+        try (final FileOutputStream outputStream = new FileOutputStream(this.options.getOutputFile())) {
+            /* Write the IV first */
+
+            outputStream.write(initializationVector);
+
+            final byte[] buffer = new byte[64];
+
+            /* Write the cipher text */
+
+            int bytesRead;
+
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                final byte[] output = cipher.update(buffer, 0, bytesRead);
+
+                if (output != null) {
+                    outputStream.write(output);
+                }
+            }
+
+            final byte[] output = cipher.doFinal();
+
+            if (output != null) {
+                outputStream.write(output);
+            }
+        } catch (final IOException ioe) {
+            throw new CryptographyException("I/O error processing output file: " + this.options.getOutputFile(), ioe);
+        } catch (final IllegalBlockSizeException | BadPaddingException e) {
+            throw new CryptographyException("Unable to encrypt data", e);
         }
 
         this.logger.exit();
