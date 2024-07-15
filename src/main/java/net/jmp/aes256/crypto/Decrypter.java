@@ -142,14 +142,11 @@ public final class Decrypter {
         final Salter salter = new Salter(this.config);
         final String salt = salter.getSalt(this.options.getUserId());
 
+        final byte[] encryptedData = Base64.getDecoder().decode(this.options.getString());
+
         /* Set up the initialization vector from the previously encrypted data */
 
-        final byte[] encryptedData = Base64.getDecoder().decode(this.options.getString());
-        final byte[] initializationVector = new byte[Config.INITIALIZATION_VECTOR_SIZE];
-
-        System.arraycopy(encryptedData, 0, initializationVector, 0, initializationVector.length);
-
-        final IvParameterSpec ivParameterSpec = new IvParameterSpec(initializationVector);
+        final IvParameterSpec ivParameterSpec = this.createIvParameterSpecFromString(encryptedData);
 
         /* Set up the secret key spec */
 
@@ -160,11 +157,11 @@ public final class Decrypter {
 
         final Cipher cipher = this.createCipher(secretKeySpec, ivParameterSpec);
 
-        /* Perform the decryption - The cipher text does not contain the IV */
+        /* Perform the decryption - The cipher text does not contain the initialization vector */
 
-        final byte[] cipherText = new byte[encryptedData.length - initializationVector.length];
+        final byte[] cipherText = new byte[encryptedData.length - Config.INITIALIZATION_VECTOR_SIZE];
 
-        System.arraycopy(encryptedData, initializationVector.length, cipherText, 0, cipherText.length);
+        System.arraycopy(encryptedData, Config.INITIALIZATION_VECTOR_SIZE, cipherText, 0, cipherText.length);
 
         byte[] decryptedData;
 
@@ -188,6 +185,30 @@ public final class Decrypter {
     }
 
     /**
+     * Create the initialization vector from the first
+     * bytes of the previously encrypted string.
+     *
+     * @param   encryptedData   byte[]
+     * @return                  javax.crypto.spec.IvParameterSpec
+     * @since                   0.5.0
+     */
+    private IvParameterSpec createIvParameterSpecFromString(final byte[] encryptedData) {
+        this.logger.entry(encryptedData);
+
+        assert encryptedData != null;
+
+        final byte[] initializationVector = new byte[Config.INITIALIZATION_VECTOR_SIZE];
+
+        System.arraycopy(encryptedData, 0, initializationVector, 0, initializationVector.length);
+
+        final IvParameterSpec ivParameterSpec = new IvParameterSpec(initializationVector);
+
+        this.logger.exit(ivParameterSpec);
+
+        return ivParameterSpec;
+    }
+
+    /**
      * Decrypt a file.
      *
      * @since   0.3.0
@@ -206,19 +227,7 @@ public final class Decrypter {
 
             /* Set up the initialization vector from the previously encrypted data */
 
-            final byte[] initializationVector = new byte[Config.INITIALIZATION_VECTOR_SIZE];
-
-            try (final FileInputStream inputStream = new FileInputStream(this.options.getInputFile())) {
-                final int bytesRead = inputStream.read(initializationVector, 0, Config.INITIALIZATION_VECTOR_SIZE);
-
-                if (bytesRead != Config.INITIALIZATION_VECTOR_SIZE) {
-                    throw new CryptographyException("Unable to read initialization vector");
-                }
-            } catch (final IOException ioe) {
-                throw new CryptographyException("I/O error processing input file: " + this.options.getInputFile(), ioe);
-            }
-
-            final IvParameterSpec ivParameterSpec = new IvParameterSpec(initializationVector);
+            final IvParameterSpec ivParameterSpec = this.createIvParameterSpecFromFile();
 
             /* Set up the secret key spec */
 
@@ -244,6 +253,36 @@ public final class Decrypter {
     }
 
     /**
+     * Create the initialization vector from the first
+     * bytes of the previously encrypted file.
+     *
+     * @return  javax.crypto.spec.IvParameterSpec
+     * @throws  net.jmp.aes256.crypto.CryptographyException
+     * @since   0.5.0
+     */
+    private IvParameterSpec createIvParameterSpecFromFile() throws CryptographyException {
+        this.logger.entry();
+
+        final byte[] initializationVector = new byte[Config.INITIALIZATION_VECTOR_SIZE];
+
+        try (final FileInputStream inputStream = new FileInputStream(this.options.getInputFile())) {
+            final int bytesRead = inputStream.read(initializationVector, 0, Config.INITIALIZATION_VECTOR_SIZE);
+
+            if (bytesRead != Config.INITIALIZATION_VECTOR_SIZE) {
+                throw new CryptographyException("Unable to read initialization vector");
+            }
+        } catch (final IOException ioe) {
+            throw new CryptographyException("I/O error processing input file: " + this.options.getInputFile(), ioe);
+        }
+
+        final IvParameterSpec ivParameterSpec = new IvParameterSpec(initializationVector);
+
+        this.logger.exit(ivParameterSpec);
+
+        return ivParameterSpec;
+    }
+
+    /**
      * Encrypt the file data.
      *
      * @param   cipher                  javax.crypto.Cipher
@@ -260,7 +299,7 @@ public final class Decrypter {
         try (final FileOutputStream outputStream = new FileOutputStream(this.options.getOutputFile())) {
             final byte[] buffer = new byte[64];
 
-            /* Skip over the IV */
+            /* Skip over the initialization vector */
 
             final long bytesSkipped = inputStream.skip(Config.INITIALIZATION_VECTOR_SIZE);
 
