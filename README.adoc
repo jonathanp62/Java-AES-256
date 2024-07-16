@@ -1,17 +1,80 @@
-= AES-256
+AES-256
+-------
 
 A program that uses AES-256 encryption and decryption for strings and files.
 
-== Configuration Settings
+Configuration Settings
+~~~~~~~~~~~~~~~~~~~~~~
 
-The configuration is expressed in JSON and is supplied by default in config/config.json.
+The configuration is expressed in JSON and is supplied by default in *config/config.json*. It can be overriden with a java system property, i.e. *--Dapp.configurationFile=config/config.json*
 
-== Logging
+[options="header"]
+|=======================
+|Key                        |Value               |Description
+|cipher                     |                    |The cipher section
+|cipher:character-set       |UTF-8               |The character set to use for the cipher
+|cipher:instance            |AES/CBC/PKCS5Padding|The instance class for the cipher
+|salter                     |                    |The salter section
+|salter:character-set       |UTF-8               |The character set to use for the salt
+|salter:iterations          |3                   |The number of iterations to make
+|password-minimum-length    |20                  |The minimum length of a password
+|pbe-key-spec-iterations    |65536               |The number of iterations to make for the PBE key spec
+|pbe-key-spec-key-length    |256                 |The key length for the PBE key spec
+|secret-key-factory-instance|PBKDF2WithHmacSHA256|The instance class for the secret key factory
+|secret-key-spec-algorithm  |AES                 |The algorithm for the secret key
+|=======================
 
-Logging is achieved using the SLF4J facade over Logback. The logging configuration is supplied in config/logback.xml.
+* A sample configuration file:
++
+[source,json]
+-----------------
+{
+	"cipher": {
+		"character-set": "UTF-8",
+		"instance": "AES/CBC/PKCS5Padding"
+	},
+	"salter": {
+		"character-set": "UTF-8",
+		"iterations": 3
+	},
+	"password-minimum-length": 20,
+	"pbe-key-spec-iterations": 65536,
+	"pbe-key-spec-key-length": 256,
+	"secret-key-factory-instance": "PBKDF2WithHmacSHA256",
+	"secret-key-spec-algorithm": "AES"
+}
+-----------------
 
-== Command Line Usage
+Logging
+~~~~~~~
+
+Logging is achieved using the SLF4J facade over Logback. The logging configuration is supplied in *config/logback.xml*. It can be overriden with a java system property, i.e. *-Dlogback.configurationFile=config/logback.xml*
+
+Command Line Usage
+~~~~~~~~~~~~~~~~~~
 
 This needs to get done.
 
-=== Current version: 0.5.0.
+Ant Tasks
+~~~~~~~~~
+
+[options="header"]
+|=======================
+|Task       |Description
+|copy-jar   |For the developer it copies the jar to a target location
+|copy-config|For the developer it copies the config.json file to a target location
+|info       |Set up to list the available tasks
+|=======================
+
+Run Scripts
+~~~~~~~~~~~
+
+This needs to get done.
+
+Gradle JavaExec Tasks
+~~~~~~~~~~~~~~~~~~~~~
+
+This needs to get done.
+
+Current version: 0.5.0.
+~~~~~~~~~~~~~~~~~~~~~~~
