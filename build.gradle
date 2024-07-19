@@ -162,7 +162,7 @@ tasks.register('execHelpOperation', JavaExec) {
 }
 
 tasks.register('execDecryptStringNoUser', JavaExec) {
-    args('decrypt', '--string', 'The quick brown fox jumped over the lazy dog!')
+    args('decrypt', '--string', '7owHsJ9ihXMytkHB6WcnU1RH03r+ymuolCU2N5x1GPMngRux8ag3VXaHbauNH6N6')
     allJvmArgs = [useAssertions, appConfigFile, logConfigFile] as List<String>
     classpath = sourceSets.main.runtimeClasspath
     description = execDescription
@@ -173,7 +173,7 @@ tasks.register('execDecryptStringNoUser', JavaExec) {
 }
 
 tasks.register('execDecryptStringUser', JavaExec) {
-    args('decrypt', '--string', 'The quick brown fox jumped over the lazy dog!', '--user', 'jonathanp62@gmail.com')
+    args('decrypt', '--string', '7owHsJ9ihXMytkHB6WcnU1RH03r+ymuolCU2N5x1GPMngRux8ag3VXaHbauNH6N6', '--user', 'jonathanp62')
     allJvmArgs = [useAssertions, appConfigFile, logConfigFile] as List<String>
     classpath = sourceSets.main.runtimeClasspath
     description = execDescription
