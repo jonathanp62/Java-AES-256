@@ -6,7 +6,7 @@ A program that uses AES-256 encryption and decryption for strings and files.
 Configuration Settings
 ~~~~~~~~~~~~~~~~~~~~~~
 
-The configuration is expressed in JSON and is supplied by default in *config/config.json*. It can be overriden with a java system property, i.e. *--Dapp.configurationFile=config/config.json*
+The configuration is expressed in JSON and is supplied by default in *config/config.json*. It can be overriden with a java system property, i.e. *-Dapp.configurationFile=config/config.json*
 
 [options="header"]
 |=======================
@@ -53,7 +53,47 @@ Logging is achieved using the SLF4J facade over Logback. The logging configurati
 Command Line Usage
 ~~~~~~~~~~~~~~~~~~
 
-This needs to get done.
+The command line synatx consists of an operation which is followed by one or more options. The possible case-insensitive operations are:
+
+* Decrypt
+* Encrypt
+* Help
+
+The options are described in the following table.
+
+[options="header"]
+|=======================
+|Long Option  |Short Option|Description
+|--help       |-h          |Display help (shown in an example below)
+|--input-file |-i          |The name of the file to encrypt or decrypt
+|--output-file|-o          |The name of the resulting encrypted or decrypted file
+|--string     |-s          |The string to encrypt or decrypt
+|--user       |-u          |The user identifier
+|=======================
+
+It is not permitted to include file options with string and vice versa. If files are to be handled then both input and output files are requred.
+
+The user identifier will be prompted for at the console if not supplied as an option.
+
+Also note that there is no command line option to provide a password. It will be prompted for at the console and has the
+following requirements:
+
+* At least one upper case character
+* At least one lower case character
+* At least one number or digit
+* At least one special character, i.e. !@#$%^&*()-_+.,<>{}=[]\|~`/'\"?
+* A minimum of twenty (20) chcracters in length
+
+[source,text]
+-----------------
+usage: aes-256.main/net.jmp.aes256.Main <decrypt | encrypt | help>
+ -h,--help                      Display this help message
+ -i,--input-file <file-name>    Encrypt/Decrypt a file
+ -o,--output-file <file-name>   Encrypted/Decrypted output file
+ -s,--string <arg>              Encrypt/Decrypt a string
+ -u,--user <user-id>            User identifier
+
+-----------------
 
 Ant Tasks
 ~~~~~~~~~
@@ -69,12 +109,34 @@ Ant Tasks
 Run Scripts
 ~~~~~~~~~~~
 
-This needs to get done.
+[options="header"]
+|=======================
+|Script|Decription
+|decrypt.sh|Wraps the run script and passes the decrypt operation
+|encrypt.sh|Wraps the run script and passes the encrypt operation
+|run.sh    |The run script that invokes the Java main class
+|=======================
 
 Gradle JavaExec Tasks
 ~~~~~~~~~~~~~~~~~~~~~
 
-This needs to get done.
+[options="header"]
+|=======================
+|Task Name              |Application Invocation
+|execNoArgs             |No arguments
+|execHelpOption         |-h
+|execHelpOperation      |help
+|execDecryptStringNoUser|decrypt --string 7owHsJ9ihXMytkHB6WcnU1RH03r+ymuolCU2
+|execDecryptStringUser  |decrypt --string 7owHsJ9ihXMytkHB6WcnU1RH03r+ymuolCU2 --user jonathanp62...
+|execDecryptFileNoUser  |decrypt --input-file /usr/local/file.bin --output-file /usr/local/file.plain
+|execDecryptFileUser    |decrypt --input-file /usr/local/file.bin --output-file /usr/local/file.plain --user jonathanp62...
+|execEncryptStringNoUser|encrypt --string The quick brown fox...
+|execEncryptStringUser  |encrypt --string The quick brown fox... --user jonathanp62...
+|execEncryptFileNoUser  |encrypt --input-file /usr/local/file.plain --output-file /usr/local/file.bin
+|execEncryptFileUser    |encrypt --input-file /usr/local/file.plain --output-file /usr/local/file.bin --user jonathanp62...
+|execUnknown            |unknown
+|execUnknownOnlyUser    |unknown --user jonathanp62...
+|=======================
 
 Current version: 0.5.0.
 ~~~~~~~~~~~~~~~~~~~~~~~
