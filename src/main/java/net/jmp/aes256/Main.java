@@ -1,13 +1,14 @@
 package net.jmp.aes256;
 
 /*
+ * (#)Main.java 0.5.0   07/19/2024
  * (#)Main.java 0.4.0   07/11/2024
  * (#)Main.java 0.3.0   07/06/2024
  * (#)Main.java 0.2.0   06/29/2024
  * (#)Main.java 0.1.0   06/27/2024
  *
  * @author   Jonathan Parker
- * @version  0.4.0
+ * @version  0.5.0
  * @since    0.1.0
  *
  * MIT License
@@ -113,10 +114,6 @@ public final class Main {
                 this.handleCommandLine(appConfig);
             }
         }, () -> this.logger.error("No configuration found for {}", Name.NAME_STRING));
-
-        /*
-         * 1. The password provided serves as the secret key
-         */
 
         this.logger.exit();
     }
