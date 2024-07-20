@@ -1,11 +1,12 @@
 package net.jmp.aes256.config;
 
 /*
+ * (#)Config.java   0.5.0   07/20/2024
  * (#)Config.java   0.4.0   07/12/2024
  * (#)Config.java   0.3.0   07/08/2024
  *
  * @author    Jonathan Parker
- * @version   0.4.0
+ * @version   0.5.0
  * @since     0.3.0
  *
  * MIT License
@@ -207,6 +208,10 @@ public final class Config {
      * @since   0.4.0
      */
     public void validate() {
+        if (this.cipher == null) {
+            throw new IllegalArgumentException("No cipher has been provided");
+        }
+
         if (!"UTF-8".equalsIgnoreCase(this.cipher.getCharacterSet())) {
             throw new IllegalArgumentException("The cipher character set must be UTF-8");
         }
@@ -225,6 +230,10 @@ public final class Config {
 
         if (!"PBKDF2WithHmacSHA256".equalsIgnoreCase(this.secretKeyFactoryInstance)) {
             throw new IllegalArgumentException("The secret key factory instance must be PBKDF2WithHmacSHA256");
+        }
+
+        if (this.salter == null) {
+            throw new IllegalArgumentException("No salter has been provided");
         }
     }
 
