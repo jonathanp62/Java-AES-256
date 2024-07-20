@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import net.jmp.aes256.config.Config;
@@ -62,12 +63,15 @@ import org.slf4j.ext.XLogger;
 /**
  * The main application class.
  */
-public final class Main {
+public final class Main implements Runnable {
     /** The default configuration file name. */
     private static final String DEFAULT_APP_CONFIG_FILE = "config/config.json";
 
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
+
+    /** The command line arguments. @since 0.5.0 */
+    private final String[] arguments;
 
     /** The command operation. */
     private CommandOperation commandOperation;
@@ -76,23 +80,22 @@ public final class Main {
     private CommandLine commandLine;
 
     /**
-     * The default constructor. It has
-     * package access in order for the
-     * unit test to access it.
+     * A constructor that takes the
+     * command line arguments from
+     * the bootstrap class.
      */
-    Main() {
+    public Main(final String[] args) {
         super();
+
+        this.arguments = Objects.requireNonNull(args);
     }
 
     /**
      * The run method.
-     *
-     * @param   args    java.lang.String[]
      */
-    void run(final String[] args) {
-        this.logger.entry((Object) args);
-
-        assert args != null;
+    @Override
+    public void run() {
+        this.logger.entry();
 
         if (this.logger.isInfoEnabled() || this.logger.isWarnEnabled() || this.logger.isErrorEnabled()) {
             System.out.format("%s %s%n", Name.NAME_STRING, Version.VERSION_STRING);
@@ -101,7 +104,7 @@ public final class Main {
         }
 
         this.getAppConfig().ifPresentOrElse(appConfig -> {
-            this.processCommandLine(args);
+            this.processCommandLine();
 
             if (this.commandLine != null) {
                 this.handleCommandLine(appConfig);
@@ -140,20 +143,16 @@ public final class Main {
     /**
      * Process all the command line arguments into
      * a single argument followed by options.
-     *
-     * @param   args    java.lang.String[]
      */
-    private void processCommandLine(final String[] args) {
-        this.logger.entry((Object) args);
-
-        assert args != null;
+    private void processCommandLine() {
+        this.logger.entry();
 
         CommandLineHandler commandLineHandler;
 
-        if (args.length == 0)
+        if (this.arguments.length == 0)
             commandLineHandler = new CommandLineHandler(new String[] {"--help"});
         else
-            commandLineHandler = new CommandLineHandler(args);
+            commandLineHandler = new CommandLineHandler(this.arguments);
 
         commandLineHandler.handle();
 

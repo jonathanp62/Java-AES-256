@@ -40,6 +40,6 @@ public final class Bootstrap {
      * @param   args    java.lang.String[]
      */
     public static void main(final String[] args) {
-        new Main().run(args);
+        new Main(args).run();
     }
 }
