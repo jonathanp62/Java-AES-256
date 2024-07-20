@@ -1,11 +1,11 @@
 package net.jmp.aes256;
 
 /*
- * (#)TestMain.java 0.2.0   07/06/2024
+ * (#)Bootstrap.java    0.5.0   07/20/2024
  *
  * @author   Jonathan Parker
- * @version  0.2.0
- * @since    0.2.0
+ * @version  0.5.0
+ * @since    0.5.0
  *
  * MIT License
  *
@@ -30,28 +30,16 @@ package net.jmp.aes256;
  * SOFTWARE.
  */
 
-import java.util.Optional;
-
-import org.junit.Test;
-
-import static org.junit.Assert.*;
-
-public final class TestMain {
-    @Test
-    public void testPromptForUserId() throws Exception {
-        final var main = new Main();
-        final var method = Main.class.getDeclaredMethod("promptForUserId", String.class);
-
-        method.setAccessible(true);
-
-        final String userId = "jonathanp62@gmail.com";
-
-        @SuppressWarnings("unchecked")
-        Optional<String> result = (Optional<String>) method.invoke(main, userId);
-
-        assertTrue(result.isPresent());
-        assertEquals(userId, result.get());
-
-        // As of Gradle 8.8 it is not possible in the :test task to set the standard input
+/**
+ * The bootstrap class.
+ */
+public final class Bootstrap {
+    /**
+     * The main method.
+     *
+     * @param   args    java.lang.String[]
+     */
+    public static void main(final String[] args) {
+        new Main().run(args);
     }
 }

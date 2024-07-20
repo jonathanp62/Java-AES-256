@@ -50,7 +50,7 @@ ext {
     appConfigFile = '-Dapp.configurationFile=config/config.json'
     execDescription = 'Run the main class with JavaExecTask'
     execGroup = 'Execution'
-    javaMainClass = 'net.jmp.aes256.Main'
+    javaMainClass = 'net.jmp.aes256.Bootstrap'
     logConfigFile = '-Dlogback.configurationFile=config/logback.xml'
     macosArchitecture = System.getProperty('macosArchitecture')
     useAssertions = '-ea'

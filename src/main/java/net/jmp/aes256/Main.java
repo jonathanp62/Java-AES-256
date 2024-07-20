@@ -36,13 +36,11 @@ package net.jmp.aes256;
 
 import com.google.gson.Gson;
 
-import java.io.Console;
 import java.io.IOException;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 import net.jmp.aes256.config.Config;
@@ -54,8 +52,6 @@ import net.jmp.aes256.crypto.Encrypter;
 import net.jmp.aes256.input.*;
 
 import net.jmp.aes256.utils.Builder;
-import net.jmp.aes256.utils.Password;
-import net.jmp.aes256.utils.PasswordException;
 
 import org.apache.commons.cli.CommandLine;
 
@@ -69,9 +65,6 @@ import org.slf4j.ext.XLogger;
 public final class Main {
     /** The default configuration file name. */
     private static final String DEFAULT_APP_CONFIG_FILE = "config/config.json";
-
-    /** The no console available message. */
-    private static final String NO_CONSOLE_AVAILABLE = "There is no console available";
 
     /** The logger. */
     private final XLogger logger = new XLogger(LoggerFactory.getLogger(this.getClass().getName()));
@@ -92,11 +85,11 @@ public final class Main {
     }
 
     /**
-     * The go method.
+     * The run method.
      *
      * @param   args    java.lang.String[]
      */
-    private void go(final String[] args) {
+    void run(final String[] args) {
         this.logger.entry((Object) args);
 
         assert args != null;
@@ -207,12 +200,14 @@ public final class Main {
         assert config != null;
         assert optionsHandler != null;
 
+        final Prompter prompter = new Prompter(config);
+
         final Options options = Builder.of(Options::new)
                 .with(Options::setString, (optionsHandler.containsString()) ? this.commandLine.getOptionValue("s") : null)
                 .with(Options::setInputFile, (optionsHandler.containsInputFile()) ? this.commandLine.getOptionValue("i") : null)
                 .with(Options::setOutputFile, (optionsHandler.containsOutputFile()) ? this.commandLine.getOptionValue("o") : null)
-                .with(Options::setUserId, this.promptForUserId((optionsHandler.containsUserId()) ? this.commandLine.getOptionValue("u") : null).orElse(null))
-                .with(Options::setPassword, this.promptForPassword(config.getPasswordMinimumLength()).orElse(null))
+                .with(Options::setUserId, prompter.promptForUserId((optionsHandler.containsUserId()) ? this.commandLine.getOptionValue("u") : null))
+                .with(Options::setPassword, prompter.promptForPassword(this.commandOperation).orElse(null))
                 .build();
 
         if (options.getPassword() != null) {
@@ -221,148 +216,11 @@ public final class Main {
             }
 
             this.handleOperation(config, options);
+        } else {
+            throw new IllegalStateException("No password was supplied");
         }
 
         this.logger.exit();
-    }
-
-    /**
-     * Prompt for the user identifier. An
-     * empty optional is returned if a
-     * console is not available.
-     *
-     * @return  java.util.Optional&lt;java.lang.String&;gt
-     */
-    private Optional<String> promptForUserId(final String userId) {
-        this.logger.entry(userId);
-
-        final Console console = System.console();
-
-        Optional<String> result;
-
-        if (console == null) {
-            this.logger.error(NO_CONSOLE_AVAILABLE);
-
-            result = Optional.empty();
-        } else {
-            if (userId == null) {
-                System.out.println("Please enter your user ID:");
-
-                result = Optional.of(console.readLine());
-            } else {
-                result = Optional.of(userId);
-            }
-        }
-
-        this.logger.exit(result);
-
-        return result;
-    }
-
-    /**
-     * Prompt for the password. An empty
-     * optional is returned if the two
-     * encryption passwords entered did
-     * not match or a console is not available.
-     *
-     * @param   minimumLength   int
-     * @return                  java.util.Optional&lt;java.lang.String&;gt
-     */
-    private Optional<String> promptForPassword(final int minimumLength) {
-        this.logger.entry(minimumLength);
-
-        Optional<String> result;
-
-        final Console console = System.console();
-
-        if (console == null) {
-            this.logger.error(NO_CONSOLE_AVAILABLE);
-
-            result = Optional.empty();
-        } else {
-            if (this.commandOperation == CommandOperation.ENCRYPT) {
-                result = this.promptForEncryptPassword(console, minimumLength);
-            } else if (this.commandOperation == CommandOperation.DECRYPT) {
-                result = this.promptForDecryptPassword(console);
-            } else {
-                result = Optional.empty();
-            }
-        }
-
-        this.logger.exit(result);
-
-        return result;
-    }
-
-    /**
-     * Prompt for the encryption password. An
-     * empty optional is returned if the two
-     * passwords entered did not match.
-     *
-     * @param   console         java.io.Console
-     * @param   minimumLength   int
-     * @return                  java.util.Optional&lt;java.lang.String&;gt
-     * @since                   0.4.0
-     */
-    private Optional<String> promptForEncryptPassword(final Console console, final int minimumLength) {
-        this.logger.entry(console, minimumLength);
-
-        assert console != null;
-
-        Optional<String> result;
-
-        System.out.print("Please enter your password:");
-
-        final char[] password1 = console.readPassword();
-
-        System.out.print("Please re-enter your password:");
-
-        final char[] password2 = console.readPassword();
-
-        if (Arrays.equals(password1, password2)) {
-            final var passwordString = new String(password1);
-
-            try {
-                Password.validate(passwordString, minimumLength);
-
-                result = Optional.of(passwordString);
-            } catch (final PasswordException pe) {
-                System.out.println(pe.getMessage());
-
-                result = Optional.empty();
-            }
-        } else {
-            System.out.println("The two (2) entered passwords do not match");
-
-            result = Optional.empty();
-        }
-
-        this.logger.exit(result);
-
-        return result;
-    }
-
-    /**
-     * Prompt for the decryption password.
-     *
-     * @param   console java.io.Console
-     * @return          java.util.Optional&lt;java.lang.String&;gt
-     * @since           0.4.0
-     */
-    private Optional<String> promptForDecryptPassword(final Console console) {
-        this.logger.entry(console);
-
-        assert console != null;
-
-        System.out.print("Please enter your password:");
-
-        final char[] password = console.readPassword();
-
-        final Optional<String> result = Optional.of(new String(password));
-
-        this.logger.exit(result);
-
-        return result;
     }
 
     /**
@@ -452,14 +310,5 @@ public final class Main {
         result.ifPresent(encrypted -> System.out.format("Encrypted: %s%n", encrypted));
 
         this.logger.exit();
-    }
-
-    /**
-     * The main method.
-     *
-     * @param   args    java.lang.String[]
-     */
-    public static void main(final String[] args) {
-        new Main().go(args);
     }
 }
