@@ -38,16 +38,16 @@ import static org.junit.Assert.assertNotNull;
 public class TestConfig {
     private Config config;
     private Cipher cipher;
-    private Salter salter;
 
     @Before
     public void setUp() {
         this.config = new Config();
         this.cipher = new Cipher();
-        this.salter = new Salter();
+
+        final var salter = new Salter();
 
         this.config.setCipher(this.cipher);
-        this.config.setSalter(this.salter);
+        this.config.setSalter(salter);
     }
 
     @Test(expected = IllegalArgumentException.class)
