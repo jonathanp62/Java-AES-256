@@ -84,7 +84,7 @@ public final class TestEncrypter {
     }
 
     private void setupFileOptions() {
-        final URL url = Thread.currentThread().getContextClassLoader().getResource("file-to-encrypt.xml");
+        final URL url = getClass().getClassLoader().getResource("file-to-encrypt.xml");
 
         assert url != null;
 
@@ -198,13 +198,9 @@ public final class TestEncrypter {
 
         final var originalFileSha256 = SHA256.getFileSHA256(this.fileOptions.getInputFile());
 
-        final URL url = Thread.currentThread().getContextClassLoader().getResource("file-to-decrypt.bin");
+        /* Decrypt the just encrypted file */
 
-        assertNotNull(url);
-
-        /* Decrypt the file */
-
-        final File file = new File(url.getPath());
+        final File file = new File(this.fileOptions.getOutputFile());
 
         final var options = Builder.of(Options::new)
                 .with(Options::setString, null)

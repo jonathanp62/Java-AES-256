@@ -84,7 +84,7 @@ public final class TestDecrypter {
     }
 
     private void setupFileOptions() {
-        final URL url = Thread.currentThread().getContextClassLoader().getResource("Most-Popular-Team-By-State.bin");
+        final URL url = getClass().getClassLoader().getResource("Most-Popular-Team-By-State.bin");
 
         assert url != null;
 
