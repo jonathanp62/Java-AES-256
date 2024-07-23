@@ -125,7 +125,7 @@ public final class Main implements Runnable {
 
         final String configFileName = System.getProperty("app.configurationFile", DEFAULT_APP_CONFIG_FILE);
 
-        this.logger.info("Reading the configuration from: {}", configFileName);
+        this.logger.debug("Reading the configuration from: {}", configFileName);
 
         Config appConfig = null;
 
