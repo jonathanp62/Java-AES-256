@@ -1,10 +1,11 @@
 <!--
+ (#)build.xml	1.0.0   07/24/2024
  (#)build.xml	0.5.0   07/13/2024
  (#)build.xml	0.4.0   07/10/2024
  (#)build.xml	0.3.0   07/06/2024
 
  @author   Jonathan Parker
- @version  0.5.0
+ @version  1.0.0
  @since    0.3.0
 
  MIT License
@@ -38,7 +39,7 @@
 	<property name="source.home" location="/Users/jonathan/IDEA-Projects/AES-256" />
 	<property name="source.config" location="${source.home}/config" />
 	<property name="source.libs" location="${source.home}/build/libs" />
-	<property name="source.version" value="0.5.0" />
+	<property name="source.version" value="1.0.0" />
 
 	<property name="target.home" location="/usr/local/aes256" />
 	<property name="target.config" location="${target.home}/config" />
