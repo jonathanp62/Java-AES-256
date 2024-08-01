@@ -36,6 +36,7 @@ package net.jmp.aes256;
 
 import com.google.gson.Gson;
 
+import java.io.File;
 import java.io.IOException;
 
 import java.nio.file.Files;
@@ -123,16 +124,22 @@ public final class Main implements Runnable {
     private Optional<Config> getAppConfig() {
         this.logger.entry();
 
-        final String configFileName = System.getProperty("app.configurationFile", DEFAULT_APP_CONFIG_FILE);
-
-        this.logger.debug("Reading the configuration from: {}", configFileName);
-
         Config appConfig = null;
 
-        try {
-            appConfig = new Gson().fromJson(Files.readString(Paths.get(configFileName)), Config.class);
-        } catch (final IOException ioe) {
-            this.logger.catching(ioe);
+        final String appHome = System.getenv("APP_HOME");
+
+        if (appHome != null) {
+            final String configFileName = System.getProperty("app.configurationFile", appHome + File.separator + DEFAULT_APP_CONFIG_FILE);
+
+            this.logger.debug("Reading the configuration from: {}", configFileName);
+
+            try {
+                appConfig = new Gson().fromJson(Files.readString(Paths.get(configFileName)), Config.class);
+            } catch (final IOException ioe) {
+                this.logger.catching(ioe);
+            }
+        } else {
+            this.logger.error("Environment variable 'APP_HOME' was not set");
         }
 
         this.logger.exit(appConfig);

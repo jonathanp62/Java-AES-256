@@ -52,6 +52,7 @@ ext {
     appConfigFile = '-Dapp.configurationFile=config/config.json'
     execDescription = 'Run the main class with JavaExecTask'
     execGroup = 'Execution'
+    execAppHome = '/Users/jonathan/IDEA-Projects/AES-256'
     javaMainClass = 'net.jmp.aes256.Bootstrap'
     logConfigFile = '-Dlogback.configurationFile=config/logback.xml'
     macosArchitecture = System.getProperty('macosArchitecture')
@@ -138,6 +139,7 @@ tasks.register('execNoArgs', JavaExec) {
     allJvmArgs = [useAssertions, appConfigFile, logConfigFile] as List<String>
     classpath = sourceSets.main.runtimeClasspath
     description = execDescription
+    environment 'APP_HOME', execAppHome
     group = execGroup
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     mainClass = javaMainClass
@@ -148,6 +150,7 @@ tasks.register('execHelpOption', JavaExec) {
     allJvmArgs = [useAssertions, appConfigFile, logConfigFile] as List<String>
     classpath = sourceSets.main.runtimeClasspath
     description = execDescription
+    environment 'APP_HOME', execAppHome
     group = execGroup
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     mainClass = javaMainClass
@@ -158,6 +161,7 @@ tasks.register('execHelpOperation', JavaExec) {
     allJvmArgs = [useAssertions, appConfigFile, logConfigFile] as List<String>
     classpath = sourceSets.main.runtimeClasspath
     description = execDescription
+    environment 'APP_HOME', execAppHome
     group = execGroup
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     mainClass = javaMainClass
@@ -168,6 +172,7 @@ tasks.register('execDecryptStringNoUser', JavaExec) {
     allJvmArgs = [useAssertions, appConfigFile, logConfigFile] as List<String>
     classpath = sourceSets.main.runtimeClasspath
     description = execDescription
+    environment 'APP_HOME', execAppHome
     group = execGroup
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     mainClass = javaMainClass
@@ -179,6 +184,7 @@ tasks.register('execDecryptStringUser', JavaExec) {
     allJvmArgs = [useAssertions, appConfigFile, logConfigFile] as List<String>
     classpath = sourceSets.main.runtimeClasspath
     description = execDescription
+    environment 'APP_HOME', execAppHome
     group = execGroup
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     mainClass = javaMainClass
@@ -190,6 +196,7 @@ tasks.register('execDecryptFileNoUser', JavaExec) {
     allJvmArgs = [useAssertions, appConfigFile, logConfigFile] as List<String>
     classpath = sourceSets.main.runtimeClasspath
     description = execDescription
+    environment 'APP_HOME', execAppHome
     group = execGroup
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     mainClass = javaMainClass
@@ -201,6 +208,7 @@ tasks.register('execDecryptFileUser', JavaExec) {
     allJvmArgs = [useAssertions, appConfigFile, logConfigFile] as List<String>
     classpath = sourceSets.main.runtimeClasspath
     description = execDescription
+    environment 'APP_HOME', execAppHome
     group = execGroup
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     mainClass = javaMainClass
@@ -212,6 +220,7 @@ tasks.register('execEncryptStringNoUser', JavaExec) {
     allJvmArgs = [useAssertions, appConfigFile, logConfigFile] as List<String>
     classpath = sourceSets.main.runtimeClasspath
     description = execDescription
+    environment 'APP_HOME', execAppHome
     group = execGroup
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     mainClass = javaMainClass
@@ -223,6 +232,7 @@ tasks.register('execEncryptStringUser', JavaExec) {
     allJvmArgs = [useAssertions, appConfigFile, logConfigFile] as List<String>
     classpath = sourceSets.main.runtimeClasspath
     description = execDescription
+    environment 'APP_HOME', execAppHome
     group = execGroup
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     mainClass = javaMainClass
@@ -234,6 +244,7 @@ tasks.register('execEncryptFileNoUser', JavaExec) {
     allJvmArgs = [useAssertions, appConfigFile, logConfigFile] as List<String>
     classpath = sourceSets.main.runtimeClasspath
     description = execDescription
+    environment 'APP_HOME', execAppHome
     group = execGroup
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     mainClass = javaMainClass
@@ -245,6 +256,7 @@ tasks.register('execEncryptFileUser', JavaExec) {
     allJvmArgs = [useAssertions, appConfigFile, logConfigFile] as List<String>
     classpath = sourceSets.main.runtimeClasspath
     description = execDescription
+    environment 'APP_HOME', execAppHome
     group = execGroup
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     mainClass = javaMainClass
@@ -256,6 +268,7 @@ tasks.register('execUnknown', JavaExec) {
     allJvmArgs = [useAssertions, appConfigFile, logConfigFile] as List<String>
     classpath = sourceSets.main.runtimeClasspath
     description = execDescription
+    environment 'APP_HOME', execAppHome
     group = execGroup
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     mainClass = javaMainClass
@@ -267,6 +280,7 @@ tasks.register('execUnknownOnlyUser', JavaExec) {
     allJvmArgs = [useAssertions, appConfigFile, logConfigFile] as List<String>
     classpath = sourceSets.main.runtimeClasspath
     description = execDescription
+    environment 'APP_HOME', execAppHome
     group = execGroup
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     mainClass = javaMainClass
