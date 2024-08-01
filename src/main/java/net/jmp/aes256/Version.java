@@ -1,6 +1,7 @@
 package net.jmp.aes256;
 
 /*
+ * (#)Version.java  1.1.0   08/01/2024
  * (#)Version.java  1.0.0   07/24/2024
  * (#)Version.java  0.5.0   07/13/2024
  * (#)Version.java  0.4.0   07/10/2024
@@ -9,7 +10,7 @@ package net.jmp.aes256;
  * (#)Version.java  0.1.0   06/27/2024
  *
  * @author    Jonathan Parker
- * @version   1.0.0
+ * @version   1.1.0
  * @since     0.1.0
  *
  * MIT License
@@ -40,7 +41,7 @@ package net.jmp.aes256;
  */
 final class Version {
     /** The version. */
-    static final String VERSION_STRING = "1.0.0";
+    static final String VERSION_STRING = "1.1.0";
 
     /**
      * The default constructor.

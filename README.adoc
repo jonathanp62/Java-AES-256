@@ -138,5 +138,5 @@ Gradle JavaExec Tasks
 |execUnknownOnlyUser    |unknown --user jonathanp62...
 |=======================
 
-Current version: 1.0.0.
+Current version: 1.1.0.
 ~~~~~~~~~~~~~~~~~~~~~~~
